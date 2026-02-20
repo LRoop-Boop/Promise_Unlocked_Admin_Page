@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 
 import {
@@ -12,18 +12,27 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import StudentDetailModal from './StudentDetail';  // ← CHANGE 1: Import the modal
+import StudentDetailModal from './StudentDetail';
+
+type Status = "Accepted" | "In Review" | "Pending" | "Rejected";
 
 interface Student {
   id: number;
   name: string;
   program: string;
   gpa: number;
-  status: "Accepted" | "In Review" | "Pending" | "Rejected";
+  status: Status;
   appliedDate: string;
+  email: string;
+  phone: string;
+  address: string;
+  birthDate: string;
+  expectedGraduation: string;
+  stamps: never[];
+  [key: string]: unknown; // allows string-indexed access for sorting
 }
 
-const students = [
+const students: Student[] = [
   { id: 1,  name: "Priya Nair",       program: "Computer Science",  gpa: 3.9, status: "Accepted",  appliedDate: "2025-01-03", email: "priya.nair@email.com", phone: "(616) 555-0123", address: "Grand Rapids, MI", birthDate: "2003-05-12", expectedGraduation: "May 2026", stamps: [] },
   { id: 2,  name: "Marcus Webb",      program: "Business Admin",    gpa: 3.4, status: "In Review",  appliedDate: "2025-01-08", email: "marcus.webb@email.com", phone: "(616) 555-0234", address: "Allendale, MI", birthDate: "2002-11-08", expectedGraduation: "May 2026", stamps: [] },
   { id: 3,  name: "Leila Ahmadi",     program: "Data Science",      gpa: 3.7, status: "In Review",  appliedDate: "2025-01-10", email: "leila.ahmadi@email.com", phone: "(616) 555-0345", address: "Holland, MI", birthDate: "2003-03-22", expectedGraduation: "May 2026", stamps: [] },
@@ -36,8 +45,8 @@ const students = [
   { id: 10, name: "Nina Kowalski",    program: "Psychology",        gpa: 3.5, status: "In Review",  appliedDate: "2025-02-01", email: "nina.k@email.com", phone: "(616) 555-1012", address: "Allendale, MI", birthDate: "2003-06-16", expectedGraduation: "May 2026", stamps: [] },
 ];
 
-function StatusBadge({ status }) {
-  const variants = {
+function StatusBadge({ status }: { status: Status }) {
+  const variants: Record<Status, string> = {
     "Accepted":  "bg-green-100 text-green-800 border-green-200",
     "In Review": "bg-yellow-100 text-yellow-800 border-yellow-200",
     "Pending":   "bg-gray-100 text-gray-700 border-gray-200",
@@ -50,7 +59,15 @@ function StatusBadge({ status }) {
   );
 }
 
-function SortableHeader({ label, field, sortField, sortDir, onSort }) {
+interface SortableHeaderProps {
+  label: string;
+  field: string;
+  sortField: string;
+  sortDir: string;
+  onSort: (field: string) => void;
+}
+
+function SortableHeader({ label, field, sortField, sortDir, onSort }: SortableHeaderProps) {
   const isActive = sortField === field;
   const Icon = isActive
     ? sortDir === "asc" ? ChevronUp : ChevronDown
@@ -73,7 +90,7 @@ export default function CandidateTable() {
   const [search, setSearch]       = useState("");
   const [sortField, setSortField] = useState("appliedDate");
   const [sortDir, setSortDir]     = useState("desc");
-  const [selectedStudent, setSelectedStudent] = useState(null);  // ← CHANGE 2: Track which student is selected
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
   const filtered = students.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -83,13 +100,13 @@ export default function CandidateTable() {
   const sorted = [...filtered].sort((a, b) => {
     const valA = a[sortField];
     const valB = b[sortField];
-    const cmp = typeof valA === "string"
+    const cmp = typeof valA === "string" && typeof valB === "string"
       ? valA.localeCompare(valB)
-      : valA - valB;
+      : (valA as number) - (valB as number);
     return sortDir === "asc" ? cmp : -cmp;
   });
 
-  function handleSort(field) {
+  function handleSort(field: string) {
     if (field === sortField) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
@@ -99,7 +116,7 @@ export default function CandidateTable() {
   }
 
   return (
-    <>  {/* ← CHANGE 3a: Wrap in fragment so we can return both table AND modal */}
+    <>
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <Input
@@ -148,9 +165,8 @@ export default function CandidateTable() {
                       {new Date(student.appliedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                     </TableCell>
                     <TableCell className="text-right">
-                      {/* ← CHANGE 3b: Add onClick to open modal */}
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => setSelectedStudent(student)}
                       >
@@ -165,9 +181,8 @@ export default function CandidateTable() {
         </div>
       </div>
 
-      {/* ← CHANGE 4: Render modal if a student is selected */}
       {selectedStudent && (
-        <StudentDetailModal 
+        <StudentDetailModal
           student={selectedStudent}
           onClose={() => setSelectedStudent(null)}
         />

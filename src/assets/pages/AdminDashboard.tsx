@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Home,
   FileText,
@@ -91,7 +90,6 @@ export default function AdminDashboard() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">My Candidates</h2>
-          
             <CandidateTable />
           </div>
 

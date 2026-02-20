@@ -1,4 +1,3 @@
-import React from 'react';
 import { X, Mail, Phone, MapPin, Calendar, Award, FileText, GraduationCap } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +15,7 @@ interface PassportStamp {
   category: "Technical" | "Leadership" | "Communication" | "Research" | "Community";
   earnedDate: string;
   description: string;
-  evidence: string;  // What they submitted to earn it
+  evidence: string;
 }
 
 interface StudentDetail {
