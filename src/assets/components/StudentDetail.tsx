@@ -8,43 +8,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-interface PassportStamp {
-  id: number;
-  name: string;
-  category: "Technical" | "Leadership" | "Communication" | "Research" | "Community";
-  earnedDate: string;
-  description: string;
-  evidence: string;
-}
-
-interface StudentDetail {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  program: string;
-  gpa: number;
-  status: "Pending" | "In Review" | "Accepted" | "Rejected";
-  appliedDate: string;
-  address: string;
-  birthDate: string;
-  expectedGraduation: string;
-  stamps: PassportStamp[];
-}
+import { type Student, type Status, type PassportStamp } from '../data/Students';
 
 interface StudentDetailModalProps {
-  student: StudentDetail;
+  student: Student;
   onClose: () => void;
 }
 
 function StampBadge({ stamp }: { stamp: PassportStamp }) {
   const categoryColors = {
-    Technical: "bg-blue-100 border-blue-300 text-blue-700",
-    Leadership: "bg-purple-100 border-purple-300 text-purple-700",
+    Technical:     "bg-blue-100 border-blue-300 text-blue-700",
+    Leadership:    "bg-purple-100 border-purple-300 text-purple-700",
     Communication: "bg-green-100 border-green-300 text-green-700",
-    Research: "bg-orange-100 border-orange-300 text-orange-700",
-    Community: "bg-pink-100 border-pink-300 text-pink-700",
+    Research:      "bg-orange-100 border-orange-300 text-orange-700",
+    Community:     "bg-pink-100 border-pink-300 text-pink-700",
   };
 
   return (
@@ -58,17 +35,17 @@ function StampBadge({ stamp }: { stamp: PassportStamp }) {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const variants = {
-    Accepted: "bg-green-100 text-green-800 border-green-200",
+function StatusBadge({ status }: { status: Status }) {
+  const variants: Record<Status, string> = {
+    Accepted:   "bg-green-100 text-green-800 border-green-200",
     "In Review": "bg-yellow-100 text-yellow-800 border-yellow-200",
-    Pending: "bg-gray-100 text-gray-700 border-gray-200",
-    Rejected: "bg-red-100 text-red-800 border-red-200",
+    Pending:    "bg-gray-100 text-gray-700 border-gray-200",
+    Rejected:   "bg-red-100 text-red-800 border-red-200",
   };
   return (
     <span
       className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${
-        variants[status as keyof typeof variants] ?? variants.Pending
+        variants[status] ?? variants.Pending
       }`}
     >
       {status}
@@ -79,19 +56,16 @@ function StatusBadge({ status }: { status: string }) {
 export default function StudentDetailModal({ student, onClose }: StudentDetailModalProps) {
   return (
     <>
-      {/* Backdrop overlay */}
       <div
         className="fixed inset-0 bg-black/50 z-40 animate-in fade-in duration-200"
         onClick={onClose}
       />
 
-      {/* Modal content */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           className="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
@@ -113,9 +87,8 @@ export default function StudentDetailModal({ student, onClose }: StudentDetailMo
             </div>
           </div>
 
-          {/* Body */}
           <div className="p-6 space-y-6">
-            {/* Basic Info Section */}
+
             <section>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <FileText size={20} className="text-gray-600" />
@@ -167,7 +140,6 @@ export default function StudentDetailModal({ student, onClose }: StudentDetailMo
               </div>
             </section>
 
-            {/* Passport Stamps - Visual Grid */}
             <section>
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <Award size={20} className="text-gray-600" />
@@ -186,7 +158,6 @@ export default function StudentDetailModal({ student, onClose }: StudentDetailMo
               )}
             </section>
 
-            {/* Stamps Details Table */}
             {student.stamps.length > 0 && (
               <section>
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Stamp Details</h3>
@@ -211,9 +182,7 @@ export default function StudentDetailModal({ student, onClose }: StudentDetailMo
                           </TableCell>
                           <TableCell className="text-gray-600">
                             {new Date(stamp.earnedDate).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
+                              month: "short", day: "numeric", year: "numeric",
                             })}
                           </TableCell>
                           <TableCell className="text-sm text-gray-600 max-w-md truncate">
@@ -229,9 +198,7 @@ export default function StudentDetailModal({ student, onClose }: StudentDetailMo
           </div>
 
           <div className="sticky bottom-0 bg-gray-50 border-t px-6 py-4 flex justify-end gap-3">
-            <Button variant="outline" onClick={onClose}>
-              Close
-            </Button>
+            <Button variant="outline" onClick={onClose}>Close</Button>
             <Button>Download Application</Button>
           </div>
         </div>

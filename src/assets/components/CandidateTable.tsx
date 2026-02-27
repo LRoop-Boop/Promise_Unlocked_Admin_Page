@@ -13,37 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import StudentDetailModal from './StudentDetail';
-
-type Status = "Accepted" | "In Review" | "Pending" | "Rejected";
-
-interface Student {
-  id: number;
-  name: string;
-  program: string;
-  gpa: number;
-  status: Status;
-  appliedDate: string;
-  email: string;
-  phone: string;
-  address: string;
-  birthDate: string;
-  expectedGraduation: string;
-  stamps: never[];
-  [key: string]: unknown; // allows string-indexed access for sorting
-}
-
-const students: Student[] = [
-  { id: 1,  name: "Priya Nair",       program: "Computer Science",  gpa: 3.9, status: "Accepted",  appliedDate: "2025-01-03", email: "priya.nair@email.com", phone: "(616) 555-0123", address: "Grand Rapids, MI", birthDate: "2003-05-12", expectedGraduation: "May 2026", stamps: [] },
-  { id: 2,  name: "Marcus Webb",      program: "Business Admin",    gpa: 3.4, status: "In Review",  appliedDate: "2025-01-08", email: "marcus.webb@email.com", phone: "(616) 555-0234", address: "Allendale, MI", birthDate: "2002-11-08", expectedGraduation: "May 2026", stamps: [] },
-  { id: 3,  name: "Leila Ahmadi",     program: "Data Science",      gpa: 3.7, status: "In Review",  appliedDate: "2025-01-10", email: "leila.ahmadi@email.com", phone: "(616) 555-0345", address: "Holland, MI", birthDate: "2003-03-22", expectedGraduation: "May 2026", stamps: [] },
-  { id: 4,  name: "Tom Okafor",       program: "Mechanical Eng.",   gpa: 2.9, status: "Pending",    appliedDate: "2025-01-15", email: "tom.okafor@email.com", phone: "(616) 555-0456", address: "Muskegon, MI", birthDate: "2003-07-30", expectedGraduation: "May 2026", stamps: [] },
-  { id: 5,  name: "Sophie Chen",      program: "Computer Science",  gpa: 4.0, status: "Accepted",  appliedDate: "2025-01-17", email: "sophie.chen@email.com", phone: "(616) 555-0567", address: "Grand Rapids, MI", birthDate: "2002-09-14", expectedGraduation: "May 2026", stamps: [] },
-  { id: 6,  name: "Diego Reyes",      program: "Psychology",        gpa: 3.2, status: "Rejected",  appliedDate: "2025-01-19", email: "diego.reyes@email.com", phone: "(616) 555-0678", address: "Kalamazoo, MI", birthDate: "2003-01-05", expectedGraduation: "May 2026", stamps: [] },
-  { id: 7,  name: "Amara Diallo",     program: "Data Science",      gpa: 3.6, status: "In Review",  appliedDate: "2025-01-22", email: "amara.diallo@email.com", phone: "(616) 555-0789", address: "Grand Rapids, MI", birthDate: "2002-12-19", expectedGraduation: "May 2026", stamps: [] },
-  { id: 8,  name: "James Harrington", program: "Business Admin",    gpa: 3.1, status: "Pending",    appliedDate: "2025-01-25", email: "james.h@email.com", phone: "(616) 555-0890", address: "Holland, MI", birthDate: "2003-04-27", expectedGraduation: "May 2026", stamps: [] },
-  { id: 9,  name: "Yuki Tanaka",      program: "Mechanical Eng.",   gpa: 3.8, status: "Accepted",  appliedDate: "2025-01-28", email: "yuki.tanaka@email.com", phone: "(616) 555-0901", address: "Muskegon, MI", birthDate: "2002-10-11", expectedGraduation: "May 2026", stamps: [] },
-  { id: 10, name: "Nina Kowalski",    program: "Psychology",        gpa: 3.5, status: "In Review",  appliedDate: "2025-02-01", email: "nina.k@email.com", phone: "(616) 555-1012", address: "Allendale, MI", birthDate: "2003-06-16", expectedGraduation: "May 2026", stamps: [] },
-];
+import { students, type Student, type Status } from '../data/Students';
 
 function StatusBadge({ status }: { status: Status }) {
   const variants: Record<Status, string> = {
@@ -98,8 +68,8 @@ export default function CandidateTable() {
   );
 
   const sorted = [...filtered].sort((a, b) => {
-    const valA = a[sortField];
-    const valB = b[sortField];
+    const valA = a[sortField as keyof Student];
+    const valB = b[sortField as keyof Student];
     const cmp = typeof valA === "string" && typeof valB === "string"
       ? valA.localeCompare(valB)
       : (valA as number) - (valB as number);

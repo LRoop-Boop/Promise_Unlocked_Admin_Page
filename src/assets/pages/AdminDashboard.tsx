@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Home,
   FileText,
@@ -13,18 +14,65 @@ import {
 } from 'lucide-react';
 
 import CandidateTable from '../components/CandidateTable';
+import ReportsPage from './ReportsPage';
 
 const navItems = [
-  { icon: Home,          label: "Dashboard",    active: true },
-  { icon: FileText,      label: "Applications"              },
-  { icon: Users,         label: "Candidates"                },
-  { icon: BarChart3,     label: "Reports"                   },
-  { icon: MessageSquare, label: "Messages"                  },
-  { icon: Calendar,      label: "Calendar"                  },
-  { icon: Settings,      label: "Settings"                  },
+  { icon: Home,          label: "Dashboard"    },
+  { icon: FileText,      label: "Applications" },
+  { icon: Users,         label: "Candidates"   },
+  { icon: BarChart3,     label: "Reports"      },
+  { icon: MessageSquare, label: "Messages"     },
+  { icon: Calendar,      label: "Calendar"     },
+  { icon: Settings,      label: "Settings"     },
 ];
 
+function DashboardHome() {
+  return (
+    <>
+      <div className="grid grid-cols-3 gap-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="text-sm text-gray-600 mb-1">New Applications</div>
+          <div className="text-3xl font-bold text-gray-900">34</div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="text-sm text-gray-600 mb-1">In Review</div>
+          <div className="text-3xl font-bold text-gray-900">128</div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="text-sm text-gray-600 mb-1">Accepted</div>
+          <div className="text-3xl font-bold text-gray-900">56</div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">My Candidates</h2>
+        <CandidateTable />
+      </div>
+    </>
+  );
+}
+
+function ComingSoon({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+      <GraduationCap size={48} className="mb-4 opacity-30" />
+      <p className="text-xl font-medium">{label}</p>
+      <p className="text-sm mt-1">This page is coming soon.</p>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
+  const [currentPage, setCurrentPage] = useState("Dashboard");
+
+  function renderPage() {
+    switch (currentPage) {
+      case "Dashboard":    return <DashboardHome />;
+      case "Reports":   return <ReportsPage />;
+      default:             return <ComingSoon label={currentPage} />;
+    }
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-100">
 
@@ -33,17 +81,19 @@ export default function AdminDashboard() {
           <GraduationCap size={24} />
           <span className="font-semibold text-lg">Admissions Dashboard</span>
         </div>
+
         <nav className="flex-1 p-4">
           <ul className="space-y-2">
-            {navItems.map(({ icon: Icon, label, active }) => (
+            {navItems.map(({ icon: Icon, label }) => (
               <li key={label}>
-                <a
-                  href="#"
-                  className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-700 ${active ? "bg-blue-700" : ""}`}
+                <button
+                  onClick={() => setCurrentPage(label)}
+                  className={`flex items-center gap-3 px-4 py-2 rounded w-full text-left hover:bg-blue-700 transition-colors
+                    ${currentPage === label ? "bg-blue-700" : ""}`}
                 >
                   <Icon size={20} />
                   <span>{label}</span>
-                </a>
+                </button>
               </li>
             ))}
           </ul>
@@ -54,7 +104,7 @@ export default function AdminDashboard() {
 
         <header className="bg-white shadow-sm border-b">
           <div className="flex items-center justify-between px-6 py-4">
-            <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-gray-800">{currentPage}</h1>
             <div className="flex items-center gap-4">
               <button className="p-2 hover:bg-gray-100 rounded-full relative">
                 <Bell size={20} className="text-gray-600" />
@@ -71,29 +121,12 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <div className="p-6">
+        {currentPage === "Dashboard" ? (
+          <div className="p-6">{renderPage()}</div>
+        ) : (
+          renderPage()
+        )}
 
-          <div className="grid grid-cols-3 gap-6 mb-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm text-gray-600 mb-1">New Applications</div>
-              <div className="text-3xl font-bold text-gray-900">34</div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm text-gray-600 mb-1">In Review</div>
-              <div className="text-3xl font-bold text-gray-900">128</div>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="text-sm text-gray-600 mb-1">Accepted</div>
-              <div className="text-3xl font-bold text-gray-900">56</div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">My Candidates</h2>
-            <CandidateTable />
-          </div>
-
-        </div>
       </div>
     </div>
   );
