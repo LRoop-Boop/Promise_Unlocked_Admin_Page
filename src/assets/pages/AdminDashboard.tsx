@@ -13,7 +13,8 @@ import {
   GraduationCap,
 } from 'lucide-react';
 
-import CandidateTable from '../components/CandidateTable';
+import PendingCandidateTable from '../components/PendingCandidateTable';
+import ApplicationsPage from './ApplicationsPage';
 import ReportsPage from './ReportsPage';
 
 const navItems = [
@@ -46,7 +47,7 @@ function DashboardHome() {
 
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">My Candidates</h2>
-        <CandidateTable />
+        <PendingCandidateTable />
       </div>
     </>
   );
@@ -69,6 +70,7 @@ export default function AdminDashboard() {
     switch (currentPage) {
       case "Dashboard":    return <DashboardHome />;
       case "Reports":   return <ReportsPage />;
+      case "Applications": return <ApplicationsPage />
       default:             return <ComingSoon label={currentPage} />;
     }
   }
