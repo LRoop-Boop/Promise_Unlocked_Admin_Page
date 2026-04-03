@@ -8,9 +8,13 @@ import { students } from "../data/Students"
 
 const totalApplicants = students.length;
 
-const acceptanceRate = Math.round(
-  (students.filter((s) => s.status === "Accepted").length / totalApplicants) * 100
-);
+const acceptedCount = students.filter((s) => s.status === "Accepted").length;
+const rejectedCount = students.filter((s) => s.status === "Rejected").length;
+const decidedApplicants = acceptedCount + rejectedCount;
+
+const acceptanceRate = decidedApplicants > 0
+  ? Math.round((acceptedCount / decidedApplicants) * 100)
+  : 0;
 
 const avgGpa = (
   students.reduce((sum, s) => sum + s.gpa, 0) / totalApplicants
