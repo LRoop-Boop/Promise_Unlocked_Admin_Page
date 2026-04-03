@@ -10,13 +10,13 @@ import ReportsPage from './ReportsPage';
 import { Student } from '../data/Students';
 
 const navItems = [
-  { icon: Home,          label: "Dashboard",    path: "/"             },
-  { icon: FileText,      label: "Applications", path: "/applications" },
-  { icon: Users,         label: "Candidates",   path: "/candidates"   },
-  { icon: BarChart3,     label: "Reports",      path: "/reports"      },
-  { icon: MessageSquare, label: "Messages",     path: "/messages"     },
-  { icon: Calendar,      label: "Calendar",     path: "/calendar"     },
-  { icon: Settings,      label: "Settings",     path: "/settings"     },
+  { icon: Home,          label: "Dashboard",    path: "" },
+  { icon: FileText,      label: "Applications", path: "applications" },
+  { icon: Users,         label: "Candidates",   path: "candidates" },
+  { icon: BarChart3,     label: "Reports",      path: "reports" },
+  { icon: MessageSquare, label: "Messages",     path: "messages" },
+  { icon: Calendar,      label: "Calendar",     path: "calendar" },
+  { icon: Settings,      label: "Settings",     path: "settings" },
 ];
 
 interface AdminDashboardProps {
@@ -68,7 +68,18 @@ function ComingSoon({ label }: { label: string }) {
 
 export default function AdminDashboard({ students, setStudents }: AdminDashboardProps) {
   const location = useLocation();
-  const currentLabel = navItems.find(item => item.path === location.pathname)?.label ?? "Dashboard";
+
+  const role = localStorage.getItem("role");
+  const view = localStorage.getItem("view");
+
+  let filteredStudents = students;
+  if (role === "counselor") {
+    filteredStudents = students.filter((s) => s.address === "Allendale, MI");
+  } else if (view === "cs") {
+    filteredStudents = students.filter((s) => s.program === "Computer Science");
+  }
+
+  const currentLabel = navItems.find(item => `/dashboard/${item.path}` === location.pathname)?.label ?? "Dashboard";
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -84,9 +95,9 @@ export default function AdminDashboard({ students, setStudents }: AdminDashboard
             {navItems.map(({ icon: Icon, label, path }) => (
               <li key={label}>
                 <Link
-                  to={path}
+                  to={`/dashboard/${path}`}
                   className={`flex items-center gap-3 px-4 py-2 rounded w-full text-left hover:bg-blue-700 transition-colors text-white
-                    ${location.pathname === path ? "bg-blue-700" : ""}`}
+                    ${location.pathname === `/dashboard/${path}` ? "bg-blue-700" : ""}`}
                 >
                   <Icon size={20} />
                   <span>{label}</span>
@@ -117,16 +128,17 @@ export default function AdminDashboard({ students, setStudents }: AdminDashboard
           </div>
         </header>
 
-        <Routes>
-          <Route path="/"             element={<div className="p-6"><DashboardHome students={students} /></div>} />
-          <Route path="/applications" element={<ApplicationsPage students={students} setStudents={setStudents} />} />
-          <Route path="/reports"      element={<ReportsPage students={students} />} />
-          <Route path="/candidates"   element={<ComingSoon label="Candidates" />} />
-          <Route path="/messages"     element={<ComingSoon label="Messages" />} />
-          <Route path="/calendar"     element={<ComingSoon label="Calendar" />} />
-          <Route path="/settings"     element={<ComingSoon label="Settings" />} />
-        </Routes>
-
+        <div className="flex-1 p-6">
+          <Routes>
+            <Route path="" element={<DashboardHome students={filteredStudents} />} />
+            <Route path="applications" element={<ApplicationsPage students={filteredStudents} setStudents={setStudents} />} />
+            <Route path="reports" element={<ReportsPage students={filteredStudents} />} />
+            <Route path="candidates" element={<ComingSoon label="Candidates" />} />
+            <Route path="messages" element={<ComingSoon label="Messages" />} />
+            <Route path="calendar" element={<ComingSoon label="Calendar" />} />
+            <Route path="settings" element={<ComingSoon label="Settings" />} />
+          </Routes>
+        </div>
       </div>
     </div>
   );

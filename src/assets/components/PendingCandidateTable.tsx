@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import StudentDetailModal from './StudentDetail';
-import { students, type Student, type Status } from '../data/Students';
+import { type Student, type Status } from '../data/Students';
 
 function StatusBadge({ status }: { status: Status }) {
   const variants: Record<Status, string> = {
@@ -38,12 +38,15 @@ function SortableHeader({ label, field, sortField, sortDir, onSort }: SortableHe
   );
 }
 
-export default function PendingCandidateTable() {
+interface PendingCandidateTableProps {
+  students: Student[];
+}
+
+export default function PendingCandidateTable({ students }: PendingCandidateTableProps) {
   const [sortField, setSortField] = useState("appliedDate");
   const [sortDir, setSortDir]     = useState("desc");
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-  // Only pending students — no search needed on the dashboard
   const pending = students.filter((s) => s.status === "Pending");
 
   const sorted = [...pending].sort((a, b) => {

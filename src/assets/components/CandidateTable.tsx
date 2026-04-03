@@ -1,19 +1,12 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
-
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import StudentDetailModal from './StudentDetail';
-import { students, type Student, type Status } from '../data/Students';
+import { type Student, type Status } from '../data/Students';
 
 function StatusBadge({ status }: { status: Status }) {
   const variants: Record<Status, string> = {
@@ -56,7 +49,12 @@ function SortableHeader({ label, field, sortField, sortDir, onSort }: SortableHe
   );
 }
 
-export default function CandidateTable() {
+interface CandidateTableProps {
+  students: Student[];
+  setStudents: React.Dispatch<React.SetStateAction<Student[]>>;
+}
+
+export default function CandidateTable({ students, setStudents }: CandidateTableProps) {
   const [search, setSearch]       = useState("");
   const [sortField, setSortField] = useState("appliedDate");
   const [sortDir, setSortDir]     = useState("desc");

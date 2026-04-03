@@ -1,53 +1,28 @@
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { students, type Status } from '../data/Students';
-
-const programCounts = Object.entries(
-  students.reduce((acc, s) => {
-    acc[s.program] = (acc[s.program] ?? 0) + 1;
-    return acc;
-  }, {} as Record<string, number>)
-).map(([program, count]) => ({ program, count }));
+import { type Student, type Status } from '../data/Students';
 
 const STATUS_COLORS: Record<Status, string> = {
-  Accepted:   "#22c55e",
+  Accepted:    "#22c55e",
   "In Review": "#eab308",
-  Pending:    "#94a3b8",
-  Rejected:   "#ef4444",
+  Pending:     "#94a3b8",
+  Rejected:    "#ef4444",
 };
 
-const statusCounts = (["Accepted", "In Review", "Pending", "Rejected"] as Status[]).map(
-  (status) => ({
-    name: status,
-    value: students.filter((s) => s.status === status).length,
-  })
-);
+interface ChartProps {
+  students: Student[];
+}
 
-// GPA distribution buckets
-const gpaBuckets = [
-  { range: "2.5 – 2.9", min: 2.5, max: 2.99 },
-  { range: "3.0 – 3.4", min: 3.0, max: 3.49 },
-  { range: "3.5 – 3.9", min: 3.5, max: 3.99 },
-  { range: "4.0",       min: 4.0, max: 4.0  },
-].map((bucket) => ({
-  range: bucket.range,
-  count: students.filter((s) => s.gpa >= bucket.min && s.gpa <= bucket.max).length,
-}));
+export function ApplicationsByProgramChart({ students }: ChartProps) {
+  const programCounts = Object.entries(
+    students.reduce((acc, s) => {
+      acc[s.program] = (acc[s.program] ?? 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  ).map(([program, count]) => ({ program, count }));
 
-// ── Sub-components ────────────────────────────────────────────────────────────
-
-export function ApplicationsByProgramChart() {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-base font-semibold text-gray-800 mb-4">Applications by Program</h3>
@@ -64,7 +39,14 @@ export function ApplicationsByProgramChart() {
   );
 }
 
-export function StatusBreakdownChart() {
+export function StatusBreakdownChart({ students }: ChartProps) {
+  const statusCounts = (["Accepted", "In Review", "Pending", "Rejected"] as Status[]).map(
+    (status) => ({
+      name: status,
+      value: students.filter((s) => s.status === status).length,
+    })
+  );
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-base font-semibold text-gray-800 mb-4">Status Breakdown</h3>
@@ -91,7 +73,17 @@ export function StatusBreakdownChart() {
   );
 }
 
-export function GpaDistributionChart() {
+export function GpaDistributionChart({ students }: ChartProps) {
+  const gpaBuckets = [
+    { range: "2.5 – 2.9", min: 2.5, max: 2.99 },
+    { range: "3.0 – 3.4", min: 3.0, max: 3.49 },
+    { range: "3.5 – 3.9", min: 3.5, max: 3.99 },
+    { range: "4.0",       min: 4.0, max: 4.0  },
+  ].map((bucket) => ({
+    range: bucket.range,
+    count: students.filter((s) => s.gpa >= bucket.min && s.gpa <= bucket.max).length,
+  }));
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-base font-semibold text-gray-800 mb-4">GPA Distribution</h3>
