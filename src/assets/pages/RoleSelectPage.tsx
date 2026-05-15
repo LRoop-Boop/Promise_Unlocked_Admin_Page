@@ -4,14 +4,12 @@ import { Users } from "lucide-react";
 export default function RoleSelectPage() {
   const navigate = useNavigate();
 
-  // Top buttons: go to login, set role only
   const goToLogin = (role: string) => {
     localStorage.setItem("role", role);
-    localStorage.removeItem("view"); // clear any previous view
+    localStorage.removeItem("view");
     navigate("/login");
   };
 
-  // Bottom buttons: go directly to dashboard, set role + view
   const goToDashboard = (role: string, view: string | null = null) => {
     localStorage.setItem("role", role);
     if (view) {
@@ -32,7 +30,6 @@ export default function RoleSelectPage() {
           <p className="text-sm text-gray-500 mt-1 text-center">Select your role to continue</p>
         </div>
 
-        {/* Top Buttons: go to login */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <button
             onClick={() => goToLogin("admissions")}
@@ -48,7 +45,6 @@ export default function RoleSelectPage() {
           </button>
         </div>
 
-        {/* Bottom Buttons: go straight to dashboard */}
         <div className="grid grid-cols-3 gap-4">
           <button
             onClick={() => goToDashboard("dev", null)}

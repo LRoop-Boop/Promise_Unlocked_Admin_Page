@@ -7,6 +7,7 @@ import {
 import PendingCandidateTable from '../components/PendingCandidateTable';
 import ApplicationsPage from './ApplicationsPage';
 import ReportsPage from './ReportsPage';
+import CandidatesPage from "./CandidatePage";
 import { Student } from '../data/Students';
 
 const navItems = [
@@ -14,14 +15,26 @@ const navItems = [
   { icon: FileText,      label: "Applications", path: "applications" },
   { icon: Users,         label: "Candidates",   path: "candidates" },
   { icon: BarChart3,     label: "Reports",      path: "reports" },
-  { icon: MessageSquare, label: "Messages",     path: "messages" },
-  { icon: Calendar,      label: "Calendar",     path: "calendar" },
-  { icon: Settings,      label: "Settings",     path: "settings" },
 ];
 
 interface AdminDashboardProps {
   students: Student[];
   setStudents: React.Dispatch<React.SetStateAction<Student[]>>;
+}
+
+function getFilteredStudents(students: Student[]) {
+  const role = localStorage.getItem("role");
+  const view = localStorage.getItem("view");
+
+  let filtered = [...students];
+
+  if (role === "counselor") {
+    filtered = students.filter((s: any) => s.hometown === "Allendale");
+  } else if (view === "cs") {
+    filtered = students.filter((s) => s.program === "Computer Science");
+  }
+
+  return filtered;
 }
 
 function DashboardHome({ students }: { students: Student[] }) {
@@ -68,22 +81,11 @@ function ComingSoon({ label }: { label: string }) {
 
 export default function AdminDashboard({ students, setStudents }: AdminDashboardProps) {
   const location = useLocation();
-
-  const role = localStorage.getItem("role");
-  const view = localStorage.getItem("view");
-
-  let filteredStudents = students;
-  if (role === "counselor") {
-    filteredStudents = students.filter((s) => s.address === "Allendale, MI");
-  } else if (view === "cs") {
-    filteredStudents = students.filter((s) => s.program === "Computer Science");
-  }
-
+  const filteredStudents = getFilteredStudents(students);
   const currentLabel = navItems.find(item => `/dashboard/${item.path}` === location.pathname)?.label ?? "Dashboard";
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-
       <aside className="w-64 bg-blue-600 text-white flex flex-col">
         <div className="p-4 flex items-center gap-2 border-b border-blue-500">
           <GraduationCap size={24} />
@@ -133,10 +135,7 @@ export default function AdminDashboard({ students, setStudents }: AdminDashboard
             <Route path="" element={<DashboardHome students={filteredStudents} />} />
             <Route path="applications" element={<ApplicationsPage students={filteredStudents} setStudents={setStudents} />} />
             <Route path="reports" element={<ReportsPage students={filteredStudents} />} />
-            <Route path="candidates" element={<ComingSoon label="Candidates" />} />
-            <Route path="messages" element={<ComingSoon label="Messages" />} />
-            <Route path="calendar" element={<ComingSoon label="Calendar" />} />
-            <Route path="settings" element={<ComingSoon label="Settings" />} />
+            <Route path="candidates" element={<CandidatesPage students={filteredStudents} />}/>
           </Routes>
         </div>
       </div>
