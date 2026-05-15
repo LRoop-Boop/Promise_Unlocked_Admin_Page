@@ -69,6 +69,13 @@ export default function AdminLoginPage() {
             Continue with University SSO
           </button>
 
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors pt-2"
+        >
+          Continue without logging in
+        </button>
+
         </div>
       </div>
     </div>
