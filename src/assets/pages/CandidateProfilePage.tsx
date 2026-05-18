@@ -77,7 +77,7 @@ export default function CandidateProfilePage({
 
         {/* QUICK STATS */}
         <div className="bg-white p-4 rounded-lg shadow space-y-3">
-          <h2 className="font-semibold">Snapshot</h2>
+          <h2 className="font-semibold">Traditional Info</h2>
 
           <div className="text-sm text-gray-600">
             GPA: <span className="font-medium">{student.gpa}</span>

@@ -22,7 +22,7 @@ import {
 } from "recharts";
 
 import taxonomy from "../data/Taxonomy";
-import { type Student, type Status, type PassportStamp } from "../data/Students";
+import { type Student, type Status } from "../data/Students";
 
 function generateRadarData(student: Student) {
   return taxonomy.domains.map((domain) => {
@@ -52,26 +52,6 @@ function StatusBadge({ status }: { status: Status }) {
     <span className={`inline-flex px-3 py-1 rounded-full text-sm border ${variants[status]}`}>
       {status}
     </span>
-  );
-}
-
-function StampBadge({ stamp }: { stamp: PassportStamp }) {
-  const colors = {
-    Technical: "bg-blue-100 text-blue-700 border-blue-300",
-    Leadership: "bg-purple-100 text-purple-700 border-purple-300",
-    Communication: "bg-green-100 text-green-700 border-green-300",
-    Research: "bg-orange-100 text-orange-700 border-orange-300",
-    Community: "bg-pink-100 text-pink-700 border-pink-300",
-  };
-
-  return (
-    <div
-      className={`p-3 rounded-lg border text-center ${colors[stamp.category]}`}
-      title={stamp.description}
-    >
-      <Award size={28} />
-      <div className="text-xs mt-2 font-semibold">{stamp.name}</div>
-    </div>
   );
 }
 
@@ -162,24 +142,6 @@ export default function StudentDetailModal({
               <div><Calendar /> {student.birthDate}</div>
               <div><GraduationCap /> {student.expectedGraduation}</div>
               <div><Award /> GPA: {student.gpa.toFixed(2)}</div>
-            </section>
-
-            <section>
-              <h3 className="font-semibold mb-3">
-                Passport Stamps ({stampCount})
-              </h3>
-
-              {stampCount === 0 ? (
-                <div className="text-gray-500 bg-gray-50 p-6 rounded">
-                  No stamps earned yet.
-                </div>
-              ) : (
-                <div className="grid grid-cols-5 gap-4">
-                  {student.stamps.map((s) => (
-                    <StampBadge key={s.id} stamp={s} />
-                  ))}
-                </div>
-              )}
             </section>
 
             {stampCount > 0 && (

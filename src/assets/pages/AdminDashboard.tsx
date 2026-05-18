@@ -1,17 +1,20 @@
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   FileText,
   Users,
   BarChart3,
   Bell,
-  Mail,
-  Menu,
   GraduationCap,
+  ChevronDown,
+  Shield,
+  LogOut,
+  Settings,
   TrendingUp,
   Clock,
   CheckCircle,
   UserCheck,
+  CircleUserRound,
 } from "lucide-react";
 
 import ApplicationsPage from "./ApplicationsPage";
@@ -20,6 +23,7 @@ import CandidatesPage from "./CandidatePage";
 import CandidateTable from "../components/CandidateTable";
 import { Student } from "../data/Students";
 import CandidateProfilePage from "./CandidateProfilePage";
+import { useState } from "react";
 import {
   ApplicationsByProgramChart,
   StatusBreakdownChart,
@@ -108,7 +112,9 @@ const navItems = [
 ];
 
 export default function AdminDashboard({ students }: AdminDashboardProps) {
+  const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const currentLabel =
     navItems.find((item) => `/dashboard/${item.path}` === location.pathname)
@@ -142,10 +148,47 @@ export default function AdminDashboard({ students }: AdminDashboardProps) {
         <header className="bg-white border-b shadow-sm px-6 py-4 flex justify-between items-center">
           <h1 className="text-xl font-semibold text-gray-800">{currentLabel}</h1>
 
-          <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-gray-100 rounded"><Bell size={18} /></button>
-            <button className="p-2 hover:bg-gray-100 rounded"><Mail size={18} /></button>
-            <button className="p-2 hover:bg-gray-100 rounded"><Menu size={18} /></button>
+          <div className="flex items-center gap-3 relative">
+            <button className="relative p-2 hover:bg-gray-100 rounded transition-colors">
+              <Bell size={20} />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            </button>
+            <div className="w-px h-6 bg-gray-200" />
+            <div className="relative">
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-100 transition-colors"
+              >
+                <CircleUserRound size={20} />
+                <ChevronDown size={16} className="text-gray-500" />
+              </button>
+              {profileOpen && (
+                <div className="absolute right-0 mt-2 w-52 bg-white border rounded-lg shadow-lg py-2 z-50">
+                  <div className="px-4 py-3 border-b">
+                    <p className="text-sm font-medium text-gray-800">
+                      Admissions Admin
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      admin@college.edu
+                    </p>
+                  </div>
+
+                  <button className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">
+                    <Shield size={16} />
+                    Admin Settings
+                  </button>
+                  <button className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">
+                    <Settings size={16} />
+                    Preferences
+                  </button>
+                  <div className="my-2 border-t" />
+                  <button onClick={() => navigate("/")} className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-red-50 text-red-600">
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
