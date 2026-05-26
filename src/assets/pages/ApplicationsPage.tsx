@@ -1,8 +1,8 @@
-import { type Student } from '../data/Students';
+import { type Participant } from '../data/Students';
 import CandidateTable from '../components/CandidateTable';
 
 interface ApplicationsPageProps {
-  students: Student[];
+  students: Participant[];
 }
 
 export default function ApplicationsPage({ students }: ApplicationsPageProps) {

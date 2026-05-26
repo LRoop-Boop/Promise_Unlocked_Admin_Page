@@ -1,4 +1,4 @@
-import { X, Mail, Phone, MapPin, Calendar, Award, GraduationCap } from "lucide-react";
+import { X, Mail, Calendar, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -8,69 +8,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { useNavigate } from "react-router-dom";
 
-import {
-  RadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
-
-import taxonomy from "../data/Taxonomy";
-import { type Student, type Status } from "../data/Students";
-
-function generateRadarData(student: Student) {
-  return taxonomy.domains.map((domain) => {
-    const score =
-      student.stamps?.filter((stamp) =>
-        domain.categories.some((cat) =>
-          cat.stamps.includes(stamp.name)
-        )
-      ).length ?? 0;
-
-    return {
-      domain: domain.name.split(" ")[0],
-      score: Math.min(score / 5, 1),
-    };
-  });
-}
-
-function StatusBadge({ status }: { status: Status }) {
-  const variants: Record<Status, string> = {
-    Accepted: "bg-green-100 text-green-800 border-green-200",
-    "In Review": "bg-yellow-100 text-yellow-800 border-yellow-200",
-    Pending: "bg-gray-100 text-gray-700 border-gray-200",
-    Rejected: "bg-red-100 text-red-800 border-red-200",
-  };
-
-  return (
-    <span className={`inline-flex px-3 py-1 rounded-full text-sm border ${variants[status]}`}>
-      {status}
-    </span>
-  );
-}
+import RadarProfileChart from "../components/RadarChart";
+import { type Participant } from "../data/Students";
 
 export default function StudentDetailModal({
-  student,
+  participant,
   onClose,
 }: {
-  student: Student;
+  participant: Participant;
   onClose: () => void;
 }) {
-  const radarData = generateRadarData(student);
   const navigate = useNavigate();
 
-  const topDomains = [...radarData]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
-    .map((d) => d.domain);
+  const skillCount = participant.skillPassport.length;
 
-  const stampCount = student.stamps?.length ?? 0;
+  const totalMappings = participant.skillPassport.reduce(
+    (sum, sp) => sum + sp.totalMappings,
+    0
+  );
+
+  const displayName = participant.displayName ?? participant.email;
+
+  const topDomains = participant.skillPassport
+    .map((sp) => sp.category)
+    .slice(0, 3);
 
   return (
     <>
@@ -81,93 +44,131 @@ export default function StudentDetailModal({
           className="bg-white rounded-xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="sticky top-0 z-10 bg-white border-b px-6 py-4 flex justify-between">
+          <div className="sticky top-0 z-10 bg-white border-b px-6 py-4 flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold">{student.name}</h2>
-              <p className="text-sm text-gray-600">{student.program}</p>
+              <h2 className="text-2xl font-bold">{displayName}</h2>
+              <p className="text-sm text-gray-500">{participant.email}</p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <StatusBadge status={student.status} />
-              <button onClick={onClose}>
-                <X />
-              </button>
-            </div>
+            <button
+              onClick={onClose}
+              className="p-1 hover:bg-gray-100 rounded"
+            >
+              <X size={20} />
+            </button>
           </div>
 
           <div className="p-6 space-y-8">
-
             <div className="grid grid-cols-2 gap-6">
-
               <div className="bg-white border rounded-lg p-4">
-                <h3 className="font-semibold mb-2">Holistic Profile</h3>
+                <h3 className="font-semibold mb-2">Skill Passport Overview</h3>
 
-                <ResponsiveContainer width="100%" height={260}>
-                  <RadarChart data={radarData}>
-                    <PolarGrid />
-                    <PolarAngleAxis dataKey="domain" />
-                    <PolarRadiusAxis domain={[0, 1]} tick={false} />
-                    <Radar dataKey="score" fill="#3b82f6" fillOpacity={0.5} />
-                    <Tooltip />
-                  </RadarChart>
-                </ResponsiveContainer>
+                <RadarProfileChart student={participant} />
               </div>
 
               <div className="space-y-4">
+                {topDomains.length > 0 && (
+                  <div className="bg-white border rounded-lg p-4">
+                    <h3 className="font-semibold mb-2">Top Skill Areas</h3>
 
-                <div className="bg-white border rounded-lg p-4">
-                  <h3 className="font-semibold mb-2">Top Strengths</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {topDomains.map((d) => (
-                      <span key={d} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                        {d}
-                      </span>
-                    ))}
+                    <div className="flex flex-wrap gap-2">
+                      {topDomains.map((d) => (
+                        <span
+                          key={d}
+                          className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded"
+                        >
+                          {d}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="bg-white border rounded-lg p-4">
                   <h3 className="font-semibold mb-2">Engagement</h3>
-                  <p className="text-sm text-gray-600">
-                    {stampCount} recorded experiences
-                  </p>
+
+                  <div className="space-y-1 text-sm text-gray-600">
+                    <p>
+                      <span className="font-medium text-gray-800">
+                        {skillCount}
+                      </span>{" "}
+                      skill areas unlocked
+                    </p>
+
+                    <p>
+                      <span className="font-medium text-gray-800">
+                        {totalMappings}
+                      </span>{" "}
+                      total interactions mapped
+                    </p>
+
+                    <p className="text-gray-400 italic text-xs mt-2">
+                      Session tracking coming soon
+                    </p>
+                  </div>
                 </div>
 
+                <div className="bg-white border rounded-lg p-4 space-y-2 text-sm text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <Mail size={14} className="text-gray-400" />
+                    {participant.email}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Calendar size={14} className="text-gray-400" />
+                    Joined{" "}
+                    {new Date(participant.createdAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Award size={14} className="text-gray-400" />
+                    Last active{" "}
+                    {new Date(participant.lastActiveAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-            <section className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-              <div><Mail /> {student.email}</div>
-              <div><Phone /> {student.phone}</div>
-              <div><MapPin /> {student.address}</div>
-              <div><Calendar /> {student.birthDate}</div>
-              <div><GraduationCap /> {student.expectedGraduation}</div>
-              <div><Award /> GPA: {student.gpa.toFixed(2)}</div>
-            </section>
 
-            {stampCount > 0 && (
+            {skillCount > 0 && (
               <section>
-                <h3 className="font-semibold mb-3">Evidence</h3>
+                <h3 className="font-semibold mb-3">Skill Passport</h3>
 
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Stamp</TableHead>
                       <TableHead>Category</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Evidence</TableHead>
+                      <TableHead>Total Mappings</TableHead>
+                      <TableHead>First Earned</TableHead>
+                      <TableHead>Last Active</TableHead>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody>
-                    {student.stamps.map((s) => (
-                      <TableRow key={s.id}>
-                        <TableCell>{s.name}</TableCell>
-                        <TableCell>{s.category}</TableCell>
-                        <TableCell>
-                          {new Date(s.earnedDate).toLocaleDateString()}
+                    {participant.skillPassport.map((sp) => (
+                      <TableRow key={sp.category}>
+                        <TableCell className="font-medium">
+                          {sp.category}
                         </TableCell>
-                        <TableCell className="text-sm text-gray-600">
-                          {s.evidence}
+                        <TableCell>{sp.totalMappings}</TableCell>
+                        <TableCell>
+                          {new Date(sp.firstMappedAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(sp.lastMappedAt).toLocaleDateString()}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -175,15 +176,25 @@ export default function StudentDetailModal({
                 </Table>
               </section>
             )}
-
           </div>
           <div className="border-t p-4 flex justify-between items-center bg-gray-50">
-            <Button variant="outline" onClick={() => { onClose(); navigate(`/dashboard/candidates/${student.id}`); }}>
-              View Profile
+            <Button
+              variant="outline"
+              onClick={() => {
+                onClose();
+                navigate(`/dashboard/candidates/${participant.uid}`);
+              }}
+            >
+              View Full Profile
             </Button>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose}>Close</Button>
-              <Button>Download</Button>
+              <Button variant="outline" onClick={onClose}>
+                Close
+              </Button>
+
+              <Button disabled title="Coming soon">
+                Download
+              </Button>
             </div>
           </div>
         </div>

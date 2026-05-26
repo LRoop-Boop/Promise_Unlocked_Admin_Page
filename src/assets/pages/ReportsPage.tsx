@@ -1,13 +1,15 @@
 import { BarChart3 } from "lucide-react";
+
 import {
   ApplicationsByProgramChart,
   StatusBreakdownChart,
   GpaDistributionChart,
 } from "../components/ReportsCharts";
-import { type Student } from "../data/Students";
+
+import { type Participant } from "../data/Students";
 
 interface ReportsPageProps {
-  students: Student[];
+  students: Participant[];
 }
 
 function StatCard({
@@ -30,27 +32,27 @@ function StatCard({
 export default function ReportsPage({ students }: ReportsPageProps) {
   const totalProfiles = students.length;
 
-  const avgGpa =
-    totalProfiles > 0
-      ? (
-          students.reduce((sum, s) => sum + s.gpa, 0) / totalProfiles
-        ).toFixed(2)
-      : "0.00";
+  // GPA placeholder until academic profile data exists
+  const avgGpa = "—";
 
-  const programCounts = students.reduce((acc, s) => {
-    const key = s.program ?? "Undeclared";
-    acc[key] = (acc[key] ?? 0) + 1;
+  // Count all skill passport categories
+  const categoryCounts = students.reduce((acc, s) => {
+    s.skillPassport.forEach((sp) => {
+      acc[sp.category] = (acc[sp.category] ?? 0) + 1;
+    });
+
     return acc;
   }, {} as Record<string, number>);
 
-  const topProgram =
-    Object.entries(programCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ??
+  const topCategory =
+    Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ??
     "N/A";
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-2">
         <BarChart3 size={24} className="text-blue-600" />
+
         <h1 className="text-2xl font-semibold text-gray-800">
           Profile Reports
         </h1>
@@ -70,8 +72,8 @@ export default function ReportsPage({ students }: ReportsPageProps) {
         />
 
         <StatCard
-          label="Top Program"
-          value={topProgram}
+          label="Top Skill Area"
+          value={topCategory}
           accent="border-l-yellow-400"
         />
       </div>

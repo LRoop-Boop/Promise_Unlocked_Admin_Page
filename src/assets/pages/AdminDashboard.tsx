@@ -21,17 +21,15 @@ import ApplicationsPage from "./ApplicationsPage";
 import ReportsPage from "./ReportsPage";
 import CandidatesPage from "./CandidatePage";
 import CandidateTable from "../components/CandidateTable";
-import { Student } from "../data/Students";
+import { Participant } from "../data/Students";
 import CandidateProfilePage from "./CandidateProfilePage";
 import { useState } from "react";
 import {
   ApplicationsByProgramChart,
-  StatusBreakdownChart,
 } from "../components/ReportsCharts";
 
 interface AdminDashboardProps {
-  students: Student[];
-  setStudents: React.Dispatch<React.SetStateAction<Student[]>>;
+  students: Participant[];
 }
 
 function StatCard({
@@ -58,12 +56,12 @@ function StatCard({
   );
 }
 
-function DashboardHome({ students }: { students: Student[] }) {
+function DashboardHome({ students }: { students: Participant[] }) {
   const metrics = {
     total: students.length,
-    newApplications: students.filter((s) => s.status === "Pending").length,
-    inReview: students.filter((s) => s.status === "In Review").length,
-    accepted: students.filter((s) => s.status === "Accepted").length,
+    newApplications: 0,
+    inReview: 0,
+    accepted: 0,
   };
 
   return (
@@ -77,9 +75,8 @@ function DashboardHome({ students }: { students: Student[] }) {
         <StatCard icon={CheckCircle} label="Accepted"           value={metrics.accepted}         color="bg-green-500" />
       </div>
 
-      {/* Charts row */}
-      <div className="grid grid-cols-2 gap-6">
-        <StatusBreakdownChart students={students} />
+      {/* Charts */}
+      <div className="space-y-6">
         <ApplicationsByProgramChart students={students} />
       </div>
 
@@ -97,7 +94,7 @@ function DashboardHome({ students }: { students: Student[] }) {
 
         <CandidateTable
           students={students}
-          filter={(s) => s.status === "Pending"}
+          filter={() => false}
         />
       </div>
     </div>
