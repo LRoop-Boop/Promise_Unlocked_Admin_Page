@@ -51,8 +51,6 @@ export default function RadarProfileChart({
 }) {
   const data = computeRadarData(student);
 
-  console.log("RADAR DATA:", data);
-
   return (
     <div className="w-full h-[300px] min-h-[300px]">
       <ResponsiveContainer width="100%" height="100%">

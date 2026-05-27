@@ -53,10 +53,22 @@ export function ApplicationsByProgramChart({ students }: ChartProps) {
           <XAxis
             dataKey="domain"
             interval={0}
-            tick={{ fontSize: 10 }}
-            angle={-30}
-            textAnchor="end"
-            height={80}
+            height={100}
+            tick={({ x, y, payload }) => (
+              <g transform={`translate(${x},${y})`}>
+                <text
+                  x={0}
+                  y={0}
+                  dy={4}
+                  textAnchor="end"
+                  fill="#6b7280"
+                  fontSize={10}
+                  transform="rotate(-35)"
+                >
+                  {payload.value}
+                </text>
+              </g>
+            )}
           />
 
           <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
@@ -68,10 +80,6 @@ export function ApplicationsByProgramChart({ students }: ChartProps) {
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Participant Type Breakdown
-// ---------------------------------------------------------------------------
 
 export function StatusBreakdownChart({ students }: ChartProps) {
   const registered = students.filter((s) => !s.isAnonymous).length;
@@ -117,10 +125,6 @@ export function StatusBreakdownChart({ students }: ChartProps) {
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Skill Passport Distribution
-// ---------------------------------------------------------------------------
 
 export function GpaDistributionChart({ students }: ChartProps) {
   const safeStudents = students ?? [];

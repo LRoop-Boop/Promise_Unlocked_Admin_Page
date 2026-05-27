@@ -24,13 +24,11 @@ export default function CandidatesPage({ students }: CandidatesPageProps) {
                 {s.displayName ?? "Anonymous Participant"}
               </h3>
 
-              {/* GPA placeholder until academic profile exists */}
               <span className="text-sm text-gray-400">
                 GPA —
               </span>
             </div>
 
-            {/* Program placeholder */}
             <p className="text-sm text-gray-500">
               {s.email}
             </p>

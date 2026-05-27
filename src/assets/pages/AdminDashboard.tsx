@@ -67,7 +67,6 @@ function DashboardHome({ students }: { students: Participant[] }) {
   return (
     <div className="space-y-6">
 
-      {/* Stat cards */}
       <div className="grid grid-cols-4 gap-4">
         <StatCard icon={Users}       label="Total Candidates"   value={metrics.total}            color="bg-blue-500" />
         <StatCard icon={Clock}       label="New Applications"   value={metrics.newApplications}  color="bg-yellow-500" />
@@ -75,12 +74,10 @@ function DashboardHome({ students }: { students: Participant[] }) {
         <StatCard icon={CheckCircle} label="Accepted"           value={metrics.accepted}         color="bg-green-500" />
       </div>
 
-      {/* Charts */}
       <div className="space-y-6">
         <ApplicationsByProgramChart students={students} />
       </div>
 
-      {/* Pending table */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
           <UserCheck size={18} className="text-yellow-500" />

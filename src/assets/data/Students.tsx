@@ -29,9 +29,6 @@ function daysAgo(n: number): number {
   return Date.now() - n * 24 * 60 * 60 * 1000;
 }
 
-/**
- * Creates consistent mock passport entries aligned with taxonomy strings
- */
 function mockPassport(categories: string[]): SkillPassport[] {
   return categories.map((category) => ({
     category,
@@ -145,6 +142,7 @@ export const participants: Participant[] = [
     skillPassport: mockPassport([
       "Entrepreneurship: Business Started",
       "Event Planning: Community Event",
+      "Language & Multilingualism",
     ]),
   },
   {
@@ -193,7 +191,6 @@ export const participants: Participant[] = [
       "Artistic Creation",
       "Music: Vocalist",
       "Visual Art",
-      "Analytical Thinking",
       "Strategic Planning",
       "Client Relations",
       "Self-Improvement",

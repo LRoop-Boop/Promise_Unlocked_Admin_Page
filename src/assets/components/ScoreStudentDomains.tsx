@@ -7,7 +7,6 @@ const normalize = (v: unknown): string => {
   }
 
   if (typeof v === "object" && v !== null) {
-    // handles accidental { label: "..." } or { name: "..." }
     const obj = v as any;
     const extracted = obj.label ?? obj.name ?? obj.category;
     return typeof extracted === "string"

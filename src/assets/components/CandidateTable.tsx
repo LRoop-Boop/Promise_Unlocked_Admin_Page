@@ -8,10 +8,6 @@ import { Input } from "@/components/ui/input";
 import StudentDetailModal from "./StudentDetail";
 import { type Participant } from "../data/Students";
 
-// ---------------------------------------------------------------------------
-// Sortable header
-// ---------------------------------------------------------------------------
-
 interface SortableHeaderProps {
   label: string;
   field: string;
@@ -36,10 +32,6 @@ function SortableHeader({ label, field, sortField, sortDir, onSort }: SortableHe
     </TableHead>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Main table
-// ---------------------------------------------------------------------------
 
 interface CandidateTableProps {
   students: Participant[];

@@ -1,4 +1,6 @@
 import { BarChart3 } from "lucide-react";
+import SKILLS_TAXONOMY from "../data/Taxonomy";
+import { scoreStudentDomains } from "../components/ScoreStudentDomains";
 
 import {
   ApplicationsByProgramChart,
@@ -32,21 +34,25 @@ function StatCard({
 export default function ReportsPage({ students }: ReportsPageProps) {
   const totalProfiles = students.length;
 
-  // GPA placeholder until academic profile data exists
   const avgGpa = "—";
 
-  // Count all skill passport categories
-  const categoryCounts = students.reduce((acc, s) => {
-    s.skillPassport.forEach((sp) => {
-      acc[sp.category] = (acc[sp.category] ?? 0) + 1;
+  const domains = Object.keys(SKILLS_TAXONOMY);
+
+  const domainCounts: Record<string, number> = Object.fromEntries(
+    domains.map((d) => [d, 0])
+  );
+
+  students.forEach((student) => {
+    const scores = scoreStudentDomains(student);
+
+    scores.forEach(({ domain, score }) => {
+      domainCounts[domain] += score;
     });
+  });
 
-    return acc;
-  }, {} as Record<string, number>);
-
-  const topCategory =
-    Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ??
-    "N/A";
+const topCategory =
+  Object.entries(domainCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ??
+  "N/A";
 
   return (
     <div className="p-6 space-y-6">
