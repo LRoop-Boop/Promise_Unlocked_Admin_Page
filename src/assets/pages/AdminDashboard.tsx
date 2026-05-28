@@ -12,7 +12,6 @@ import {
   Settings,
   TrendingUp,
   Clock,
-  CheckCircle,
   UserCheck,
   CircleUserRound,
 } from "lucide-react";
@@ -58,20 +57,46 @@ function StatCard({
 
 function DashboardHome({ students }: { students: Participant[] }) {
   const metrics = {
-    total: students.length,
-    newApplications: 0,
-    inReview: 0,
-    accepted: 0,
-  };
+  total: students.length,
+  newProfiles: students.length,
+  reviewed: 0,
+  mappedSkills: students.reduce(
+    (sum, s) => sum + s.skillPassport.length,
+    0
+  ),
+};
 
   return (
     <div className="space-y-6">
 
       <div className="grid grid-cols-4 gap-4">
-        <StatCard icon={Users}       label="Total Candidates"   value={metrics.total}            color="bg-blue-500" />
-        <StatCard icon={Clock}       label="New Applications"   value={metrics.newApplications}  color="bg-yellow-500" />
-        <StatCard icon={TrendingUp}  label="In Review"          value={metrics.inReview}         color="bg-purple-500" />
-        <StatCard icon={CheckCircle} label="Accepted"           value={metrics.accepted}         color="bg-green-500" />
+        <StatCard
+          icon={Users}
+          label="Total Participants"
+          value={metrics.total}
+          color="bg-blue-500"
+        />
+
+        <StatCard
+          icon={Clock}
+          label="New Profiles"
+          value={metrics.newProfiles}
+          color="bg-yellow-500"
+        />
+
+        <StatCard
+          icon={UserCheck}
+          label="Reviewed Profiles"
+          value={metrics.reviewed}
+          color="bg-purple-500"
+        />
+
+        <StatCard
+          icon={TrendingUp}
+          label="Mapped Skills"
+          value={metrics.mappedSkills}
+          color="bg-green-500"
+        />
       </div>
 
       <div className="space-y-6">
@@ -82,16 +107,15 @@ function DashboardHome({ students }: { students: Participant[] }) {
         <div className="flex items-center gap-2 mb-4">
           <UserCheck size={18} className="text-yellow-500" />
           <h2 className="text-base font-semibold text-gray-800">
-            Awaiting Review
+            New Participant Profiles
           </h2>
           <span className="ml-auto text-sm text-gray-400">
-            {metrics.newApplications} pending
+            {metrics.newProfiles} profiles
           </span>
         </div>
 
         <CandidateTable
           students={students}
-          filter={() => false}
         />
       </div>
     </div>

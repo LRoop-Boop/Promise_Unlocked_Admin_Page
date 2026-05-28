@@ -155,36 +155,12 @@ export default function CandidateProfilePage({
 
                     <div className="border rounded-lg p-4">
                       <p className="text-xs text-gray-400 mb-1">
-                        Current Status
+                        Date Earned
                       </p>
 
-                      <p className="text-sm font-medium text-green-600">
-                        Active
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="border rounded-lg p-4">
-                      <p className="text-xs text-gray-400 mb-1">
-                        First Earned
-                      </p>
-
-                      <p className="text-sm font-medium">
+                      <p className="text-xl font-semibold">
                         {new Date(
                           selectedStamp.firstMappedAt
-                        ).toLocaleDateString()}
-                      </p>
-                    </div>
-
-                    <div className="border rounded-lg p-4">
-                      <p className="text-xs text-gray-400 mb-1">
-                        Last Active
-                      </p>
-
-                      <p className="text-sm font-medium">
-                        {new Date(
-                          selectedStamp.lastMappedAt
                         ).toLocaleDateString()}
                       </p>
                     </div>
@@ -193,11 +169,11 @@ export default function CandidateProfilePage({
                   <div className="border rounded-xl p-5 bg-gray-50 space-y-3">
                     <div>
                       <h3 className="font-semibold text-sm">
-                        Evidence & Context
+                        Evidence
                       </h3>
 
                       <p className="text-xs text-gray-500 mt-1">
-                        Rich evidence support is coming soon.
+                        Coming Soon!
                       </p>
                     </div>
 
@@ -214,10 +190,6 @@ export default function CandidateProfilePage({
                         <li>Timeline progression for this skill</li>
                         <li>Contextual mapping explanations</li>
                       </ul>
-                    </div>
-
-                    <div className="text-xs text-gray-400 italic">
-                      No evidence has been attached to this stamp yet.
                     </div>
                   </div>
                 </div>

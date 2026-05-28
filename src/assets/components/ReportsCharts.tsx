@@ -82,23 +82,25 @@ export function ApplicationsByProgramChart({ students }: ChartProps) {
 }
 
 export function StatusBreakdownChart({ students }: ChartProps) {
-  const registered = students.filter((s) => !s.isAnonymous).length;
-  const anonymous = students.length - registered;
+
+  const reviewed = 0;
+
+  const newProfiles = students.length - reviewed;
 
   const statusCounts = [
-    { name: "Registered", value: registered },
-    { name: "Anonymous", value: anonymous },
+    { name: "Reviewed", value: reviewed },
+    { name: "New Profiles", value: newProfiles },
   ];
 
   const COLORS: Record<string, string> = {
-    Registered: "#22c55e",
-    Anonymous: "#94a3b8",
+    Reviewed: "#22c55e",
+    "New Profiles": "#94a3b8",
   };
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-base font-semibold text-gray-800 mb-4">
-        Participant Type
+        Profile Review Status
       </h3>
 
       <ResponsiveContainer width="100%" height={260}>
@@ -114,7 +116,10 @@ export function StatusBreakdownChart({ students }: ChartProps) {
             paddingAngle={3}
           >
             {statusCounts.map((entry) => (
-              <Cell key={entry.name} fill={COLORS[entry.name]} />
+              <Cell
+                key={entry.name}
+                fill={COLORS[entry.name]}
+              />
             ))}
           </Pie>
 
