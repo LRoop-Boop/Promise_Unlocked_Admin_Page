@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/auth/:path*",
+      "destination": "https://api-xbdqcem4zq-uc.a.run.app/auth/:path*"
+    },
+    {
+      "source": "/participants/:path*",
+      "destination": "https://api-xbdqcem4zq-uc.a.run.app/participants/:path*"
+    }
+  ]
+}
