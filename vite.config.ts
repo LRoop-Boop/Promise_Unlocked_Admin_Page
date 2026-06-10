@@ -9,4 +9,16 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-})
+  server: {
+    proxy: {
+      '/auth': {
+        target: 'https://api-xbdqcem4zq-uc.a.run.app',
+        changeOrigin: true,
+      },
+      '/participants': {
+        target: 'https://api-xbdqcem4zq-uc.a.run.app',
+        changeOrigin: true,
+      },
+    }
+  }
+});

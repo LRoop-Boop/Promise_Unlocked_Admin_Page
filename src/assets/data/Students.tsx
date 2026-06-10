@@ -7,6 +7,7 @@ export interface PassportCategoryMapping {
 
 export interface SkillPassport {
   category: string;
+  level: number;
   firstMappedAt: number;
   lastMappedAt: number;
   totalMappings: number;
@@ -20,8 +21,6 @@ export interface Participant {
   photoURL: string | null;
   createdAt: number;
   lastActiveAt: number;
-  isAnonymous: boolean;
-
   skillPassport: SkillPassport[];
 }
 
@@ -32,6 +31,7 @@ function daysAgo(n: number): number {
 function mockPassport(categories: string[]): SkillPassport[] {
   return categories.map((category) => ({
     category,
+    level: 1,
     firstMappedAt: daysAgo(60),
     lastMappedAt: daysAgo(Math.floor(Math.random() * 30)),
     totalMappings: Math.floor(Math.random() * 8) + 1,
@@ -47,7 +47,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(90),
     lastActiveAt: daysAgo(1),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Research Skills",
       "Athletics: Team Sport",
@@ -63,7 +62,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(85),
     lastActiveAt: daysAgo(3),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Family Responsibilities: Household Manager",
       "Tutoring: Peer Tutoring",
@@ -80,7 +78,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(80),
     lastActiveAt: daysAgo(2),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Music: Vocalist",
       "Performance: Dance",
@@ -94,7 +91,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(75),
     lastActiveAt: daysAgo(7),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Academic Competition: Math / Science Olympiad",
       "Research Skills",
@@ -110,7 +106,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(70),
     lastActiveAt: daysAgo(0),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Leadership: Club / Org Officer",
       "Entrepreneurship: Business Started",
@@ -124,7 +119,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(68),
     lastActiveAt: daysAgo(5),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Family Responsibilities: Household Manager",
       "Tutoring: Peer Tutoring",
@@ -138,7 +132,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(65),
     lastActiveAt: daysAgo(1),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Entrepreneurship: Business Started",
       "Event Planning: Community Event",
@@ -152,7 +145,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(60),
     lastActiveAt: daysAgo(10),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Athletics: Team Sport",
       "Leadership: Team Captain",
@@ -168,7 +160,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(55),
     lastActiveAt: daysAgo(2),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Academic Competition: Coding / Hackathon",
       "Entrepreneurship: Product / App Created",
@@ -182,7 +173,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(50),
     lastActiveAt: daysAgo(4),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Leadership",
       "Critical Thinking",
@@ -204,7 +194,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(48),
     lastActiveAt: daysAgo(6),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Research Skills",
     ]),
@@ -216,7 +205,6 @@ export const participants: Participant[] = [
     photoURL: null,
     createdAt: daysAgo(45),
     lastActiveAt: daysAgo(1),
-    isAnonymous: false,
     skillPassport: mockPassport([
       "Tutoring: Community / Youth Tutoring",
       "Leadership: Peer Mentor or Tutor",
