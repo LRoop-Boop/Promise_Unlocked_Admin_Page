@@ -10,11 +10,21 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(
+    () => localStorage.getItem("adminToken")
+  );
   const [bypassed, setBypassed] = useState(false);
 
-  const login = (newToken: string) => { setToken(newToken); setBypassed(false); };
-  const logout = () => { setToken(null); setBypassed(false); };
+  const login = (newToken: string) => {
+    localStorage.setItem("adminToken", newToken);
+    setToken(newToken);
+    setBypassed(false);
+  };
+  const logout = () => {
+    localStorage.removeItem("adminToken");
+    setToken(null);
+    setBypassed(false);
+  };
 
   return (
     <AuthContext.Provider value={{ token, bypassed, login, logout }}>

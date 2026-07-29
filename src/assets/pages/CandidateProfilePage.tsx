@@ -245,34 +245,133 @@ export default function CandidateProfilePage({
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-white p-4 rounded-lg shadow space-y-3">
-            <h2 className="font-semibold">
-              Traditional Info
+          <div className="bg-white p-4 rounded-lg shadow space-y-4">
+            <h2 className="font-semibold text-lg">
+              Participant Information
             </h2>
 
-            <div className="text-sm text-gray-600">
-              GPA:{" "}
-              <span className="font-medium text-gray-400">
-                —
-              </span>
-            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
 
-            <div className="text-sm text-gray-600">
-              Skill Areas:{" "}
-              <span className="font-medium">
-                {student.skillPassport.length}
-              </span>
-            </div>
+              <div>
+                <p className="text-gray-400">Full Name</p>
+                <p>{student.fullName ?? "Not provided"}</p>
+              </div>
 
-            <div className="text-sm text-gray-600">
-              Email: {student.email}
-            </div>
+              <div>
+                <p className="text-gray-400">Display Name</p>
+                <p>{student.displayName ?? "Not provided"}</p>
+              </div>
 
-            <div className="text-sm text-gray-600">
-              Joined:{" "}
-              {new Date(
-                student.createdAt
-              ).toLocaleDateString()}
+              <div>
+                <p className="text-gray-400">Email</p>
+                <p>{student.email ?? "Not provided"}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Phone</p>
+                <p>{student.phone ?? "Not provided"}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Gender</p>
+                <p>{student.gender ?? "Not provided"}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Ethnicity</p>
+                <p>{student.ethnicity ?? "Not provided"}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Date of Birth</p>
+                <p>{student.dateOfBirth ?? "Not provided"}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Selected PVA</p>
+                <p>{student.selectedPvaId ?? "None"}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Address</p>
+                <p>{student.address ?? "Not provided"}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">School</p>
+                <p>{student.schoolName ?? "Not provided"}</p>
+              </div>
+
+              <div className="col-span-2">
+                <p className="text-gray-400">School Address</p>
+                <p>{student.schoolAddress ?? "Not provided"}</p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Joined</p>
+                <p>
+                  {new Date(student.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-400">Last Active</p>
+                <p>
+                  {student.lastActiveAt
+                    ? new Date(student.lastActiveAt).toLocaleDateString()
+                    : "Never"}
+                </p>
+              </div>
+
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="font-semibold text-lg mb-4">
+              Passport Summary
+            </h2>
+
+            <div className="grid grid-cols-4 gap-4">
+
+              <div className="rounded-lg border p-4 text-center">
+                <p className="text-xs text-gray-400">
+                  Skill Areas
+                </p>
+
+                <p className="text-2xl font-bold text-blue-600">
+                  {student.skillPassport.length}
+                </p>
+              </div>
+
+              <div className="rounded-lg border p-4 text-center">
+                <p className="text-xs text-gray-400">
+                  Total Stamps
+                </p>
+
+                <p className="text-2xl font-bold text-blue-600">
+                  {/* TODO */}
+                </p>
+              </div>
+
+              <div className="rounded-lg border p-4 text-center">
+                <p className="text-xs text-gray-400">
+                  Latest Activity
+                </p>
+
+                <p className="font-medium">
+                  {new Date(student.lastActiveAt).toLocaleDateString()}
+                </p>
+              </div>
+
+              <div className="rounded-lg border p-4 text-center">
+                <p className="text-xs text-gray-400">
+                  Selected PVA
+                </p>
+
+                <p className="font-medium">
+                  {student.selectedPvaId ?? "None"}
+                </p>
+              </div>
+
             </div>
           </div>
         </div>

@@ -34,8 +34,6 @@ function StatCard({
 export default function ReportsPage({ students }: ReportsPageProps) {
   const totalProfiles = students.length;
 
-  const avgGpa = "—";
-
   const domains = Object.keys(SKILLS_TAXONOMY);
 
   const domainCounts: Record<string, number> = Object.fromEntries(
@@ -69,12 +67,6 @@ const topCategory =
           label="Total Profiles"
           value={totalProfiles}
           accent="border-l-blue-500"
-        />
-
-        <StatCard
-          label="Average GPA"
-          value={avgGpa}
-          accent="border-l-purple-500"
         />
 
         <StatCard

@@ -23,10 +23,6 @@ export default function CandidatesPage({ students }: CandidatesPageProps) {
               <h3 className="font-semibold">
                 {s.displayName ?? "Anonymous Participant"}
               </h3>
-
-              <span className="text-sm text-gray-400">
-                GPA —
-              </span>
             </div>
 
             <p className="text-sm text-gray-500">

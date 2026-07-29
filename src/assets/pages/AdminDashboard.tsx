@@ -16,7 +16,7 @@ import {
   CircleUserRound,
 } from "lucide-react";
 
-import ApplicationsPage from "./ApplicationsPage";
+//import ApplicationsPage from "./ApplicationsPage";
 import ReportsPage from "./ReportsPage";
 import CandidatesPage from "./CandidatePage";
 import CandidateTable from "../components/CandidateTable";
@@ -124,7 +124,7 @@ function DashboardHome({ students }: { students: Participant[] }) {
 
 const navItems = [
   { icon: Home,    label: "Dashboard",    path: "" },
-  { icon: FileText, label: "Applications", path: "applications" },
+  //{ icon: FileText, label: "Applications", path: "applications" },
   { icon: Users,   label: "Candidates",   path: "candidates" },
   { icon: BarChart3, label: "Reports",    path: "reports" },
 ];
@@ -213,7 +213,7 @@ export default function AdminDashboard({ students }: AdminDashboardProps) {
         <div className="flex-1 p-6">
           <Routes>
             <Route path=""             element={<DashboardHome students={students} />} />
-            <Route path="applications" element={<ApplicationsPage students={students} />} />
+            {/*<Route path="applications" element={<ApplicationsPage students={students} />} />*/}
             <Route path="candidates/:id" element={<CandidateProfilePage students={students} />} />
             <Route path="candidates"   element={<CandidatesPage students={students} />} />
             <Route path="reports"      element={<ReportsPage students={students} />} />

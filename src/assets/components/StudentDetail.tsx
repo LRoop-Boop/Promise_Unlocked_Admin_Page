@@ -229,10 +229,6 @@ export default function StudentDetailModal({
                       </span>{" "}
                       total interactions mapped
                     </p>
-
-                    <p className="text-gray-400 italic text-xs mt-2">
-                      Session tracking coming soon
-                    </p>
                   </div>
                 </div>
 

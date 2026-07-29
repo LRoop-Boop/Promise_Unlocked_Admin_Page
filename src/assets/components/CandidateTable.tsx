@@ -44,11 +44,16 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selected, setSelected] = useState<Participant | null>(null);
 
-  const base = filter ? students.filter(filter) : students;
+  const base = (filter ? students.filter(filter) : students).filter(
+    (p) => p.email != null
+  );
 
   const filtered = base.filter((p) => {
-    const name = (p.displayName ?? p.email).toLowerCase();
-    return name.includes(search.toLowerCase()) || p.email.toLowerCase().includes(search.toLowerCase());
+    const name = (p.displayName ?? "").toLowerCase();
+    const email = (p.email ?? "").toLowerCase();
+    const query = search.toLowerCase();
+
+    return name.includes(query) || email.includes(query);
   });
 
   const sorted = [...filtered].sort((a, b) => {
@@ -59,11 +64,11 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
       valA = a.skillPassport.length;
       valB = b.skillPassport.length;
     } else if (sortField === "displayName") {
-      valA = (a.displayName ?? a.email).toLowerCase();
-      valB = (b.displayName ?? b.email).toLowerCase();
+      valA = (a.displayName ?? a.email ?? "").toLowerCase();
+      valB = (b.displayName ?? b.email ?? "").toLowerCase();
     } else {
-      valA = a[sortField];
-      valB = b[sortField];
+      valA = a[sortField] ?? 0;
+      valB = b[sortField] ?? 0;
     }
 
     const cmp =

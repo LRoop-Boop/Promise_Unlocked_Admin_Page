@@ -3,14 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { apiFetch } from '../../api/client';
-import { type Participant } from '../data/Students';
 
 interface LoginResponse {
   idToken: string;
-}
-
-interface ParticipantsResponse {
-  participants: Participant[];
 }
 
 export default function AdminLoginPage() {
@@ -27,18 +22,17 @@ export default function AdminLoginPage() {
     setError(null);
     setLoading(true);
     try {
-      // Step 1: authenticate and get token
+      // Authenticate and get a fresh ID token (carries current custom claims,
+      // e.g. admin/superadmin — this is why we always mint here rather than
+      // reusing a cached token).
       const { idToken } = await apiFetch<LoginResponse>('/auth/login', {
         method: 'POST',
         body: { email, password },
       });
 
-      // Step 2: use token to fetch all participants
-      const { participants } = await apiFetch<ParticipantsResponse>('/participants', {
-        token: idToken,
-      });
-
-      // Step 3: store both in context, then go to dashboard
+      // Store the token; useParticipants (Students.tsx) is the single
+      // ground-truth fetch for participant data and runs once we land on
+      // /dashboard. No need to fetch /participants here too.
       login(idToken);
       navigate('/dashboard');
     } catch (err) {
