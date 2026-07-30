@@ -1,6 +1,5 @@
 import { BarChart3 } from "lucide-react";
-import SKILLS_TAXONOMY from "../data/Taxonomy";
-import { scoreStudentDomains } from "../components/ScoreStudentDomains";
+import { REGIONS } from "../data/Taxonomy";
 
 import {
   ApplicationsByProgramChart,
@@ -34,18 +33,17 @@ function StatCard({
 export default function ReportsPage({ students }: ReportsPageProps) {
   const totalProfiles = students.length;
 
-  const domains = Object.keys(SKILLS_TAXONOMY);
 
   const domainCounts: Record<string, number> = Object.fromEntries(
-    domains.map((d) => [d, 0])
+    REGIONS.map((region) => [region, 0])
   );
 
   students.forEach((student) => {
-    const scores = scoreStudentDomains(student);
-
-    scores.forEach(({ domain, score }) => {
-      domainCounts[domain] += score;
-    });
+    for (const sp of student.skillPassport ?? []) {
+        if (sp.category in domainCounts) {
+          domainCounts[sp.category] += sp.totalMappings;
+        }
+      }
   });
 
 const topCategory =
@@ -53,16 +51,9 @@ const topCategory =
   "N/A";
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-2">
-        <BarChart3 size={24} className="text-blue-600" />
+    <div className="space-y-6">
 
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Profile Reports
-        </h1>
-      </div>
-
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <StatCard
           label="Total Profiles"
           value={totalProfiles}

@@ -19,6 +19,14 @@ export default defineConfig({
         target: 'https://api-xbdqcem4zq-uc.a.run.app',
         changeOrigin: true,
       },
+      '/admin': {
+        target: 'https://api-xbdqcem4zq-uc.a.run.app',
+        changeOrigin: true,
+      },
+      '/sessions': {
+        target: 'https://api-xbdqcem4zq-uc.a.run.app',
+        changeOrigin: true,
+      },
     }
   }
 });

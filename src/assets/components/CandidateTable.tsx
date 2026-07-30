@@ -44,9 +44,7 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selected, setSelected] = useState<Participant | null>(null);
 
-  const base = (filter ? students.filter(filter) : students).filter(
-    (p) => p.email != null
-  );
+  const base = filter ? students.filter(filter) : students;
 
   const filtered = base.filter((p) => {
     const name = (p.displayName ?? "").toLowerCase();
@@ -61,8 +59,8 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
     let valB: number | string;
 
     if (sortField === "skillPassport") {
-      valA = a.skillPassport.length;
-      valB = b.skillPassport.length;
+      valA = a.skillPassport.reduce((sum, sp) => sum + sp.totalMappings, 0);
+      valB = b.skillPassport.reduce((sum, sp) => sum + sp.totalMappings, 0);
     } else if (sortField === "displayName") {
       valA = (a.displayName ?? a.email ?? "").toLowerCase();
       valB = (b.displayName ?? b.email ?? "").toLowerCase();
@@ -112,7 +110,7 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
                 <TableHead>Email</TableHead>
                 <SortableHeader label="Joined"      field="createdAt"     sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                 <SortableHeader label="Last Active" field="lastActiveAt"  sortField={sortField} sortDir={sortDir} onSort={handleSort} />
-                <SortableHeader label="Skill Areas" field="skillPassport" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortableHeader label="Total Stamps" field="skillPassport" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -143,10 +141,10 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
                     </TableCell>
                     <TableCell>
                       <span className="font-semibold text-blue-700">
-                        {p.skillPassport.length}
+                        {p.skillPassport.reduce((sum, sp) => sum + sp.totalMappings, 0)}
                       </span>
                       <span className="text-gray-400 text-xs ml-1">
-                        {p.skillPassport.length === 1 ? "area" : "areas"}
+                        {p.skillPassport.reduce((sum, sp) => sum + sp.totalMappings, 0) === 1 ? "stamp" : "stamps"}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">

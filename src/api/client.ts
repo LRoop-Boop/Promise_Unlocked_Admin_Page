@@ -167,3 +167,97 @@ export async function getPvaCatalog(token: string): Promise<ApiPva[]> {
   const response = await apiFetch<PvaCatalogResponse>('/pva-catalog', { token });
   return response.pvas;
 }
+
+export interface StampInstance {
+  stampName: string;
+  category: string;
+  categoryId: string;
+  tier: number;
+  timesUnlocked: number;
+  firstUnlockedAt: string;
+  lastUnlockedAt: string;
+  participantId: string;
+  sessionId: string;
+}
+
+export async function getParticipantStamps(
+  token: string,
+  participantId: string
+): Promise<StampInstance[]> {
+  const res = await fetch(`${BASE_URL}/admin/stamps/participants/${participantId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to load stamps (${res.status})`);
+  const data = await res.json();
+  return data.stamps ?? [];
+}
+
+export interface StampEvidenceInteraction {
+  id: string;
+  sequenceIndex: number;
+  question: string;
+  answer: string;
+  justification: string;
+  mappingOutcome: string;
+  mappedCategory: string;
+  specificStamp: string;
+  timestamp: string;
+}
+
+export async function getStampEvidence(
+  token: string,
+  participantId: string,
+  sessionId: string,
+  stampName: string
+): Promise<{ stamp: StampInstance; interactions: StampEvidenceInteraction[] }> {
+  const res = await fetch(
+    `${BASE_URL}/admin/stamps/participants/${participantId}/sessions/${sessionId}/stamps/${encodeURIComponent(
+      stampName
+    )}/evidence`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (!res.ok) throw new Error(`Failed to load stamp evidence (${res.status})`);
+  return res.json();
+}
+
+export interface AdminSessionSummary {
+  sessionId: string;
+  status: string;
+  startedAt: string;
+  lastActiveAt: string;
+  completedAt: string | null;
+  totalInteractions: number;
+}
+
+export async function getParticipantSessions(
+  token: string,
+  participantId: string
+): Promise<AdminSessionSummary[]> {
+  const res = await fetch(`${BASE_URL}/sessions?participantId=${participantId}&pageSize=200`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to load sessions (${res.status})`);
+  const data = await res.json();
+  return data.sessions ?? [];
+}
+
+export interface SessionInteraction {
+  id: string;
+  sequenceIndex: number;
+  question: string;
+  answer: string;
+  mappingOutcome: string;
+  isWeakFit: boolean;
+  timestamp: string;
+}
+
+export async function getSessionDetail(token: string, sessionId: string) {
+  const res = await fetch(`${BASE_URL}/sessions/${sessionId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to load session (${res.status})`);
+  return res.json() as Promise<{
+    session: AdminSessionSummary;
+    interactions: SessionInteraction[];
+  }>;
+}

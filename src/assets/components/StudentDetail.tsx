@@ -23,10 +23,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import RadarProfileChart from "../components/RadarChart";
-
-import {
-  SKILL_TO_DOMAIN,
-} from "../components/ScoreStudentDomains";
+import { useAuth } from "../../context/AuthContext";
 
 import { type Participant } from "../data/Students";
 
@@ -56,6 +53,7 @@ export default function StudentDetailModal({
   onClose: () => void;
 }) {
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const [expandedDomains, setExpandedDomains] = useState<
     Record<string, boolean>
@@ -77,17 +75,11 @@ export default function StudentDetailModal({
     > = {};
 
     for (const sp of participant.skillPassport ?? []) {
-      const key = normalize(sp.category);
-
-      const domains = SKILL_TO_DOMAIN[key] ?? ["Other"];
-
-      for (const domain of domains) {
-        if (!grouped[domain]) {
-          grouped[domain] = [];
-        }
-
-        grouped[domain].push(sp);
-      }
+      const domain = sp.category;
+     if (!grouped[domain]) {
+       grouped[domain] = [];
+     }
+     grouped[domain].push(sp);
     }
 
     return grouped;
@@ -138,7 +130,13 @@ export default function StudentDetailModal({
                   Skill Passport Overview
                 </h3>
 
-                <RadarProfileChart student={participant} />
+                {token ? (
+                 <RadarProfileChart token={token} participantId={participant.uid} />
+               ) : (
+                 <p className="text-sm text-gray-500">
+                   Sign in as an admin to view the growth radar.
+                 </p>
+               )}
               </div>
 
               <div className="space-y-4">
@@ -220,7 +218,7 @@ export default function StudentDetailModal({
                       <span className="font-medium text-gray-800">
                         {skillCount}
                       </span>{" "}
-                      skill areas unlocked
+                      stamps unlocked
                     </p>
 
                     <p>
@@ -296,21 +294,13 @@ export default function StudentDetailModal({
 
                   <TableBody>
                     {participant.skillPassport.map((sp) => {
-                      const domains =
-                        SKILL_TO_DOMAIN[
-                          normalize(sp.category)
-                        ] ?? ["Other"];
-
+                      
                       return (
                         <TableRow
                           key={`${sp.category}-${sp.firstMappedAt}`}
                         >
                           <TableCell className="font-medium">
                             {sp.category}
-                          </TableCell>
-
-                          <TableCell>
-                            {domains.join(", ")}
                           </TableCell>
 
                           <TableCell>

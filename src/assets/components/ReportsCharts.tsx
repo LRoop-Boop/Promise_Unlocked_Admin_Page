@@ -13,32 +13,30 @@ import {
 } from "recharts";
 
 import { type Participant } from "../data/Students";
-import SKILLS_TAXONOMY from "../data/Taxonomy";
-import { scoreStudentDomains } from "../components/ScoreStudentDomains";
+import { REGIONS } from "../data/Taxonomy";
 
 interface ChartProps {
   students: Participant[];
 }
 
 export function ApplicationsByProgramChart({ students }: ChartProps) {
-  const domains = Object.keys(SKILLS_TAXONOMY);
 
   const domainCounts: Record<string, number> = Object.fromEntries(
-    domains.map((d) => [d, 0])
+    REGIONS.map((region) => [region, 0])
   );
 
   students.forEach((student) => {
-    const scores = scoreStudentDomains(student);
-
-    scores.forEach(({ domain, score }) => {
-      domainCounts[domain] += score;
-    });
+    for (const sp of student.skillPassport ?? []) {
+        if (sp.category in domainCounts) {
+          domainCounts[sp.category] += sp.totalMappings;
+        }
+      }
   });
 
-  const chartData = domains.map((domain) => ({
+  const chartData = REGIONS.map((domain) => ({
     domain,
-    count: domainCounts[domain] ?? 0,
-  }));
+     count: domainCounts[domain] ?? 0,
+   }));
 
   return (
     <div className="bg-white rounded-lg shadow p-6">

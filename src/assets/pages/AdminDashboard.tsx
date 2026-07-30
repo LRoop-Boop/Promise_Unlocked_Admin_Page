@@ -14,6 +14,7 @@ import {
   Clock,
   UserCheck,
   CircleUserRound,
+  BrainCircuit,
 } from "lucide-react";
 
 //import ApplicationsPage from "./ApplicationsPage";
@@ -22,6 +23,7 @@ import CandidatesPage from "./CandidatePage";
 import CandidateTable from "../components/CandidateTable";
 import { Participant } from "../data/Students";
 import CandidateProfilePage from "./CandidateProfilePage";
+import TaxonomyPage from "./TaxonomyPage";
 import { useState } from "react";
 import {
   ApplicationsByProgramChart,
@@ -127,6 +129,7 @@ const navItems = [
   //{ icon: FileText, label: "Applications", path: "applications" },
   { icon: Users,   label: "Candidates",   path: "candidates" },
   { icon: BarChart3, label: "Reports",    path: "reports" },
+  { icon: BrainCircuit, label: "Taxonomy",     path: "taxonomy" },
 ];
 
 export default function AdminDashboard({ students }: AdminDashboardProps) {
@@ -217,6 +220,7 @@ export default function AdminDashboard({ students }: AdminDashboardProps) {
             <Route path="candidates/:id" element={<CandidateProfilePage students={students} />} />
             <Route path="candidates"   element={<CandidatesPage students={students} />} />
             <Route path="reports"      element={<ReportsPage students={students} />} />
+            <Route path="taxonomy"     element={<TaxonomyPage />} />
           </Routes>
         </div>
       </div>

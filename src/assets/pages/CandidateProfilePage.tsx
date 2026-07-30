@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import {
@@ -10,11 +10,11 @@ import {
 import { type Participant } from "../data/Students";
 import { Button } from "@/components/ui/button";
 import RadarProfileChart from "../components/RadarChart";
-import { ResponsiveContainer } from "recharts";
+import { getPvaCatalog, type ApiPva } from "../../api/client";
 
-import {
-  SKILL_TO_DOMAIN,
-} from "../components/ScoreStudentDomains";
+import StampsPanel from "../components/StampsPanel";
+import ChatLogPanel from "../components/ChatLogPanel";
+import { useAuth } from "../../context/AuthContext";
 
 const normalize = (v: unknown): string => {
   if (typeof v === "string") {
@@ -23,9 +23,7 @@ const normalize = (v: unknown): string => {
 
   if (typeof v === "object" && v !== null) {
     const obj = v as any;
-
     const extracted = obj.label ?? obj.name ?? obj.category;
-
     return typeof extracted === "string"
       ? extracted.toLowerCase().replace(/[^a-z0-9]/g, "")
       : "";
@@ -40,45 +38,28 @@ export default function CandidateProfilePage({
   students: Participant[];
 }) {
   const { id } = useParams();
-
+  const { token } = useAuth();
   const navigate = useNavigate();
 
-  const [expandedDomains, setExpandedDomains] = useState<
-    Record<string, boolean>
-  >({});
+  const [expandedDomains, setExpandedDomains] = useState<Record<string, boolean>>({});
 
-  const [selectedStamp, setSelectedStamp] =
-    useState<any>(null);
+  const [selectedStamp, setSelectedStamp] = useState<any>(null);
+
+  const [pvas, setPvas] = useState<ApiPva[]>([]);
 
   const student = students.find((s) => s.uid === id);
 
-  if (!student) {
-    return <div className="p-6">Student not found</div>;
-  }
-
   const groupedDomains = useMemo(() => {
-    const grouped: Record<
-      string,
-      typeof student.skillPassport
-    > = {};
+    const grouped: Record<string, Participant["skillPassport"]> = {};
 
-    for (const sp of student.skillPassport ?? []) {
-      const key = normalize(sp.category);
-
-      const domains =
-        SKILL_TO_DOMAIN[key] ?? ["Other"];
-
-      for (const domain of domains) {
-        if (!grouped[domain]) {
-          grouped[domain] = [];
-        }
-
-        grouped[domain].push(sp);
-      }
+    for (const sp of student?.skillPassport ?? []) {
+      const domain = sp.category;
+      if (!grouped[domain]) grouped[domain] = [];
+      grouped[domain].push(sp);
     }
 
     return grouped;
-  }, [student.skillPassport]);
+  }, [student?.skillPassport]);
 
   const toggleDomain = (domain: string) => {
     setExpandedDomains((prev) => ({
@@ -86,6 +67,36 @@ export default function CandidateProfilePage({
       [domain]: !prev[domain],
     }));
   };
+
+  if (!student) {
+    return <div className="p-6">Student not found</div>;
+  }
+
+  const selectedPvaName =
+    pvas.find((p) => p.id === student.selectedPvaId)?.name ?? "None";
+
+  const totalStamps = student.skillPassport.reduce(
+    (sum, sp) => sum + sp.totalMappings,
+    0
+  );
+
+  useEffect(() => {
+    if (!token) return;
+
+    let cancelled = false;
+
+    getPvaCatalog(token)
+      .then((data) => {
+        if (!cancelled) {
+          setPvas(data);
+        }
+      })
+      .catch(console.error);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   return (
     <>
@@ -104,16 +115,11 @@ export default function CandidateProfilePage({
                     <h2 className="text-xl font-bold">
                       {selectedStamp.category}
                     </h2>
-
-                    <p className="text-sm text-gray-500">
-                      Stamp Details
-                    </p>
+                    <p className="text-sm text-gray-500">Stamp Details</p>
                   </div>
 
                   <button
-                    onClick={() =>
-                      setSelectedStamp(null)
-                    }
+                    onClick={() => setSelectedStamp(null)}
                     className="p-1 hover:bg-gray-100 rounded"
                   >
                     <X size={18} />
@@ -123,22 +129,13 @@ export default function CandidateProfilePage({
                 <div className="p-6 space-y-6">
                   <div>
                     <p className="text-xs uppercase tracking-wide text-gray-400 mb-2">
-                      Domains
+                      Category
                     </p>
 
                     <div className="flex flex-wrap gap-2">
-                      {(
-                        SKILL_TO_DOMAIN[
-                          normalize(selectedStamp.category)
-                        ] ?? ["Other"]
-                      ).map((domain: string) => (
-                        <span
-                          key={domain}
-                          className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded"
-                        >
-                          {domain}
-                        </span>
-                      ))}
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                       {selectedStamp.category}
+                     </span>
                     </div>
                   </div>
 
@@ -147,7 +144,6 @@ export default function CandidateProfilePage({
                       <p className="text-xs text-gray-400 mb-1">
                         Total Mappings
                       </p>
-
                       <p className="text-xl font-semibold">
                         {selectedStamp.totalMappings}
                       </p>
@@ -157,7 +153,6 @@ export default function CandidateProfilePage({
                       <p className="text-xs text-gray-400 mb-1">
                         Date Earned
                       </p>
-
                       <p className="text-xl font-semibold">
                         {new Date(
                           selectedStamp.firstMappedAt
@@ -168,39 +163,17 @@ export default function CandidateProfilePage({
 
                   <div className="border rounded-xl p-5 bg-gray-50 space-y-3">
                     <div>
-                      <h3 className="font-semibold text-sm">
-                        Evidence
-                      </h3>
-
+                      <h3 className="font-semibold text-sm">Evidence</h3>
                       <p className="text-xs text-gray-500 mt-1">
-                        Coming Soon!
+                        See the "Earned Stamps" section below for individual
+                        stamp evidence with question/answer/justification.
                       </p>
-                    </div>
-
-                    <div className="border border-dashed rounded-lg p-4 bg-white">
-                      <p className="text-sm text-gray-500">
-                        Future versions of this badge will include:
-                      </p>
-
-                      <ul className="mt-3 space-y-2 text-sm text-gray-600 list-disc list-inside">
-                        <li>Conversation excerpts and quotes</li>
-                        <li>Session participation evidence</li>
-                        <li>Mentor observations and notes</li>
-                        <li>Linked projects and artifacts</li>
-                        <li>Timeline progression for this skill</li>
-                        <li>Contextual mapping explanations</li>
-                      </ul>
                     </div>
                   </div>
                 </div>
 
                 <div className="border-t px-6 py-4 flex justify-end">
-                  <Button
-                    variant="outline"
-                    onClick={() =>
-                      setSelectedStamp(null)
-                    }
-                  >
+                  <Button variant="outline" onClick={() => setSelectedStamp(null)}>
                     Close
                   </Button>
                 </div>
@@ -210,55 +183,40 @@ export default function CandidateProfilePage({
         </>
       )}
 
-      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+      <div className="space-y-6">
         <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
           <div>
             <h1 className="text-2xl font-bold">
-              {student.displayName ??
-                "Anonymous Participant"}
+              {student.displayName ?? "Anonymous Participant"}
             </h1>
-
-            <p className="text-sm text-gray-500">
-              {student.email}
-            </p>
+            <p className="text-sm text-gray-500">{student.email}</p>
           </div>
 
-          <Button
-            variant="outline"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="outline" onClick={() => navigate(-1)}>
             Back
           </Button>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
           <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="font-semibold mb-2">
-              Holistic Profile
-            </h2>
+            <h2 className="font-semibold mb-2">Holistic Profile</h2>
 
-            <ResponsiveContainer
-              width="100%"
-              height={300}
-            >
-              <RadarProfileChart student={student} />
-            </ResponsiveContainer>
+            {token ? (
+             <RadarProfileChart token={token} participantId={student.uid} />
+           ) : (
+             <p className="text-sm text-gray-500">
+               Sign in as an admin to view the growth radar.
+             </p>
+           )}
           </div>
 
           <div className="bg-white p-4 rounded-lg shadow space-y-4">
-            <h2 className="font-semibold text-lg">
-              Participant Information
-            </h2>
+            <h2 className="font-semibold text-lg">Participant Information</h2>
 
             <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
 
               <div>
                 <p className="text-gray-400">Full Name</p>
-                <p>{student.fullName ?? "Not provided"}</p>
-              </div>
-
-              <div>
-                <p className="text-gray-400">Display Name</p>
                 <p>{student.displayName ?? "Not provided"}</p>
               </div>
 
@@ -289,7 +247,7 @@ export default function CandidateProfilePage({
 
               <div>
                 <p className="text-gray-400">Selected PVA</p>
-                <p>{student.selectedPvaId ?? "None"}</p>
+                <p>{selectedPvaName}</p>
               </div>
 
               <div>
@@ -302,16 +260,14 @@ export default function CandidateProfilePage({
                 <p>{student.schoolName ?? "Not provided"}</p>
               </div>
 
-              <div className="col-span-2">
+              <div>
                 <p className="text-gray-400">School Address</p>
                 <p>{student.schoolAddress ?? "Not provided"}</p>
               </div>
 
               <div>
                 <p className="text-gray-400">Joined</p>
-                <p>
-                  {new Date(student.createdAt).toLocaleDateString()}
-                </p>
+                <p>{new Date(student.createdAt).toLocaleDateString()}</p>
               </div>
 
               <div>
@@ -322,119 +278,33 @@ export default function CandidateProfilePage({
                     : "Never"}
                 </p>
               </div>
-
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="font-semibold text-lg mb-4">
-              Passport Summary
-            </h2>
-
-            <div className="grid grid-cols-4 gap-4">
-
-              <div className="rounded-lg border p-4 text-center">
-                <p className="text-xs text-gray-400">
-                  Skill Areas
-                </p>
-
-                <p className="text-2xl font-bold text-blue-600">
-                  {student.skillPassport.length}
-                </p>
-              </div>
-
-              <div className="rounded-lg border p-4 text-center">
-                <p className="text-xs text-gray-400">
-                  Total Stamps
-                </p>
-
-                <p className="text-2xl font-bold text-blue-600">
-                  {/* TODO */}
-                </p>
-              </div>
-
-              <div className="rounded-lg border p-4 text-center">
-                <p className="text-xs text-gray-400">
-                  Latest Activity
-                </p>
-
-                <p className="font-medium">
-                  {new Date(student.lastActiveAt).toLocaleDateString()}
-                </p>
-              </div>
-
-              <div className="rounded-lg border p-4 text-center">
-                <p className="text-xs text-gray-400">
-                  Selected PVA
-                </p>
-
-                <p className="font-medium">
-                  {student.selectedPvaId ?? "None"}
-                </p>
-              </div>
-
             </div>
           </div>
         </div>
 
         <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="font-semibold mb-4">
-            Skill Domain Explorer
-          </h2>
+          <h2 className="font-semibold text-lg mb-4">Passport Summary</h2>
 
-          <div className="space-y-4">
-            {Object.entries(groupedDomains).map(
-              ([domain, skills]) => {
-                const expanded =
-                  expandedDomains[domain];
+          {token ? (
+            <StampsPanel token={token} participantId={student.uid} selectedPvaId={student.selectedPvaId}/>
+          ) : (
+            <p className="text-sm text-gray-500">
+              Sign in as an admin to view earned stamps and evidence.
+            </p>
+          )}
+        </div>
 
-                return (
-                  <div
-                    key={domain}
-                    className="border rounded-lg overflow-hidden"
-                  >
-                    <button
-                      onClick={() =>
-                        toggleDomain(domain)
-                      }
-                      className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition"
-                    >
-                      <div className="flex items-center gap-2">
-                        {expanded ? (
-                          <ChevronDown size={16} />
-                        ) : (
-                          <ChevronRight size={16} />
-                        )}
+        {/* --- Chat Logs (full transcript, safety review) --- */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="font-semibold mb-4">Chat Logs</h2>
 
-                        <span className="font-medium text-sm">
-                          {domain}
-                        </span>
-
-                        <span className="text-xs text-gray-500">
-                          ({skills.length})
-                        </span>
-                      </div>
-                    </button>
-
-                    {expanded && (
-                      <div className="p-4 flex flex-wrap gap-2 bg-white">
-                        {skills.map((s) => (
-                          <button
-                            key={`${s.category}-${s.firstMappedAt}`}
-                            onClick={() =>
-                              setSelectedStamp(s)
-                            }
-                            className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-2 rounded transition"
-                          >
-                            {s.category}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-            )}
-          </div>
+          {token ? (
+            <ChatLogPanel token={token} participantId={student.uid} />
+          ) : (
+            <p className="text-sm text-gray-500">
+              Sign in as an admin to view chat logs.
+            </p>
+          )}
         </div>
       </div>
     </>
