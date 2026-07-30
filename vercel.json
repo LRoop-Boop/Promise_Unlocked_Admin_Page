@@ -19,6 +19,10 @@
     {
       "source": "/pva-catalog",
       "destination": "https://api-xbdqcem4zq-uc.a.run.app/pva-catalog"
+    },
+    {
+      "source": "/((?!auth|participants|admin|sessions|pva-catalog|assets|.*\\..*).*)",
+      "destination": "/index.html"
     }
   ]
 }
