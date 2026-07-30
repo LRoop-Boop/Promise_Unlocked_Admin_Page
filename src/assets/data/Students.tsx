@@ -32,7 +32,13 @@ export interface Participant {
 
   // Contact
   phone: string | null;
-  address: string | null;
+  address: {
+    city: string | null;
+    country: string | null;
+    postalCode: string | null;
+    state: string| null;
+    street: string | null;
+  }
 
   // School
   schoolName: string | null;
