@@ -7,6 +7,18 @@
     {
       "source": "/participants/:path*",
       "destination": "https://api-xbdqcem4zq-uc.a.run.app/participants/:path*"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "https://api-xbdqcem4zq-uc.a.run.app/admin/:path*"
+    },
+    {
+      "source": "/sessions/:path*",
+      "destination": "https://api-xbdqcem4zq-uc.a.run.app/sessions/:path*"
+    },
+    {
+      "source": "/pva-catalog",
+      "destination": "https://api-xbdqcem4zq-uc.a.run.app/pva-catalog"
     }
   ]
 }
