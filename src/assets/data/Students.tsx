@@ -38,7 +38,7 @@ export interface Participant {
     postalCode: string | null;
     state: string| null;
     street: string | null;
-  }
+  } | null;
 
   // School
   schoolName: string | null;

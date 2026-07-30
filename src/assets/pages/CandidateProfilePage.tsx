@@ -252,7 +252,7 @@ export default function CandidateProfilePage({
 
               <div>
                 <p className="text-gray-400">Address</p>
-                <p>{student.address.street ?? "Not provided"}</p>
+                <p>{student.address?.street ?? "Not provided"}</p>
               </div>
 
               <div>
