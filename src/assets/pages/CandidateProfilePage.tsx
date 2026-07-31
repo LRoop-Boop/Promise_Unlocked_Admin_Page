@@ -252,7 +252,19 @@ export default function CandidateProfilePage({
 
               <div>
                 <p className="text-gray-400">Address</p>
-                <p>{student.address?.street ?? "Not provided"}</p>
+                <p>
+                  {student.address
+                    ? [
+                        student.address.street,
+                        student.address.city,
+                        student.address.state,
+                        student.address.postalCode,
+                        student.address.country,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")
+                    : "Not provided"}
+                </p>
               </div>
 
               <div>

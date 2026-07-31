@@ -18,7 +18,13 @@ export interface ApiParticipant {
 
   // Contact
   phone: string | null;
-  address: string | null;
+  address: {
+    street: string | null;
+    city: string | null;
+    state: string | null;
+    postalCode: string | null;
+    country: string | null;
+  } | null;
 
   // School
   schoolName: string | null;
@@ -58,16 +64,9 @@ export function adaptParticipant(raw: ApiParticipant): Participant {
     dateOfBirth: raw.dateOfBirth,
 
     // Contact
+    // Contact
     phone: raw.phone,
-    address: raw.address
-      ? {
-          street: raw.address,
-          city: null,
-          state: null,
-          postalCode: null,
-          country: null,
-        }
-      : null,
+    address: raw.address,
 
     // School
     schoolName: raw.schoolName,
