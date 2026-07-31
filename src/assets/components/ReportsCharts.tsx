@@ -14,7 +14,7 @@ import {
 
 import { type Participant } from "../data/Students";
 import { REGIONS } from "../data/Taxonomy";
-import { type StampCategorySummary } from "../../api/client";
+import { type StampCategorySummary, type ParticipantPassportSummary } from "../../api/client";
 
 interface ChartProps {
   students: Participant[];
@@ -140,12 +140,13 @@ export function StatusBreakdownChart({ students }: ChartProps) {
   );
 }
 
-export function GpaDistributionChart({ students }: ChartProps) {
+export function GpaDistributionChart({
+  students,
+  passportByUid = {},
+}: ChartProps & { passportByUid?: Record<string, ParticipantPassportSummary> }) {
   const safeStudents = students ?? [];
 
-  const counts = safeStudents.map((s) =>
-    (s?.skillPassport ?? []).reduce((sum, sp) => sum + sp.totalMappings, 0)
-  );
+  const counts = safeStudents.map((s) => passportByUid[s.uid]?.totalStampsUnlocked ?? 0);
 
   const buckets = [
     { range: "0", min: 0, max: 0 },

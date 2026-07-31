@@ -28,7 +28,7 @@ import { useState, useEffect } from "react";
 import {
   ApplicationsByProgramChart,
 } from "../components/ReportsCharts";
-import { getStampCategorySummary, type StampCategorySummary } from "../../api/client";
+import { getStampCategorySummary, getAllPassports, type StampCategorySummary, type ParticipantPassportSummary } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 
 interface AdminDashboardProps {
@@ -59,7 +59,7 @@ function StatCard({
   );
 }
 
-function DashboardHome({ students }: { students: Participant[] }) {
+function DashboardHome({ students, passportByUid }: { students: Participant[]; passportByUid: Record<string, ParticipantPassportSummary> }) {
   const { token } = useAuth();
   const [categorySummary, setCategorySummary] = useState<StampCategorySummary[]>([]);
 
@@ -83,8 +83,8 @@ function DashboardHome({ students }: { students: Participant[] }) {
     total: students.length,
     newProfiles: students.length,
     reviewed: 0,
-    mappedSkills: students.reduce(
-      (sum, s) => sum + s.skillPassport.length,
+    mappedSkills: Object.values(passportByUid).reduce(
+      (sum, p) => sum + p.totalStampsUnlocked,
       0
     ),
   };
@@ -139,7 +139,7 @@ function DashboardHome({ students }: { students: Participant[] }) {
           </span>
         </div>
 
-        <CandidateTable students={students} />
+        <CandidateTable students={students} passportByUid={passportByUid} />
       </div>
     </div>
   );
@@ -157,6 +157,24 @@ export default function AdminDashboard({ students }: AdminDashboardProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { token } = useAuth();
+  const [passportByUid, setPassportByUid] = useState<Record<string, ParticipantPassportSummary>>({});
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+
+    getAllPassports(token)
+      .then((summaries) => {
+        if (cancelled) return;
+        const map: Record<string, ParticipantPassportSummary> = {};
+        for (const s of summaries) map[s.uid] = s;
+        setPassportByUid(map);
+      })
+      .catch(console.error);
+
+    return () => { cancelled = true; };
+  }, [token]);
 
   const currentLabel =
     navItems.find((item) => `/dashboard/${item.path}` === location.pathname)
@@ -236,11 +254,11 @@ export default function AdminDashboard({ students }: AdminDashboardProps) {
 
         <div className="flex-1 p-6">
           <Routes>
-            <Route path=""             element={<DashboardHome students={students} />} />
+            <Route path=""             element={<DashboardHome students={students} passportByUid={passportByUid} />} />
             {/*<Route path="applications" element={<ApplicationsPage students={students} />} />*/}
-            <Route path="candidates/:id" element={<CandidateProfilePage students={students} />} />
-            <Route path="candidates"   element={<CandidatesPage students={students} />} />
-            <Route path="reports"      element={<ReportsPage students={students} />} />
+            <Route path="candidates/:id" element={<CandidateProfilePage students={students} passportByUid={passportByUid} />} />
+            <Route path="candidates"   element={<CandidatesPage students={students} passportByUid={passportByUid} />} />
+            <Route path="reports"      element={<ReportsPage students={students} passportByUid={passportByUid} />} />
             <Route path="taxonomy"     element={<TaxonomyPage />} />
           </Routes>
         </div>

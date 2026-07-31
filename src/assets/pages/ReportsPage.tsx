@@ -9,11 +9,12 @@ import {
 } from "../components/ReportsCharts";
 
 import { type Participant } from "../data/Students";
-import { getStampCategorySummary, type StampCategorySummary } from "../../api/client";
+import { getStampCategorySummary, type StampCategorySummary, type ParticipantPassportSummary } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 
 interface ReportsPageProps {
   students: Participant[];
+  passportByUid?: Record<string, ParticipantPassportSummary>;
 }
 
 function StatCard({
@@ -33,7 +34,7 @@ function StatCard({
   );
 }
 
-export default function ReportsPage({ students }: ReportsPageProps) {
+export default function ReportsPage({ students, passportByUid = {} }: ReportsPageProps) {
   const { token } = useAuth();
   const [categorySummary, setCategorySummary] = useState<StampCategorySummary[]>([]);
 
@@ -102,7 +103,7 @@ export default function ReportsPage({ students }: ReportsPageProps) {
         <StatusBreakdownChart students={students} />
       </div>
 
-      <GpaDistributionChart students={students} />
+      <GpaDistributionChart students={students} passportByUid={passportByUid} />
     </div>
   );
 }

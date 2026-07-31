@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import StudentDetailModal from "./StudentDetail";
 import { type Participant } from "../data/Students";
+import { type ParticipantPassportSummary } from "../../api/client";
 
 interface SortableHeaderProps {
   label: string;
@@ -36,9 +37,10 @@ function SortableHeader({ label, field, sortField, sortDir, onSort }: SortableHe
 interface CandidateTableProps {
   students: Participant[];
   filter?: (p: Participant) => boolean;
+  passportByUid?: Record<string, ParticipantPassportSummary>;
 }
 
-export default function CandidateTable({ students, filter }: CandidateTableProps) {
+export default function CandidateTable({ students, filter, passportByUid = {} }: CandidateTableProps) {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<"displayName" | "lastActiveAt" | "createdAt" | "skillPassport">("lastActiveAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -59,8 +61,8 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
     let valB: number | string;
 
     if (sortField === "skillPassport") {
-      valA = a.skillPassport.reduce((sum, sp) => sum + sp.totalMappings, 0);
-      valB = b.skillPassport.reduce((sum, sp) => sum + sp.totalMappings, 0);
+      valA = passportByUid[a.uid]?.totalStampsUnlocked ?? 0;
+      valB = passportByUid[b.uid]?.totalStampsUnlocked ?? 0;
     } else if (sortField === "displayName") {
       valA = (a.displayName ?? a.email ?? "").toLowerCase();
       valB = (b.displayName ?? b.email ?? "").toLowerCase();
@@ -141,10 +143,10 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
                     </TableCell>
                     <TableCell>
                       <span className="font-semibold text-blue-700">
-                        {p.skillPassport.reduce((sum, sp) => sum + sp.totalMappings, 0)}
+                        {passportByUid[p.uid]?.totalStampsUnlocked ?? 0}
                       </span>
                       <span className="text-gray-400 text-xs ml-1">
-                        {p.skillPassport.reduce((sum, sp) => sum + sp.totalMappings, 0) === 1 ? "stamp" : "stamps"}
+                        {(passportByUid[p.uid]?.totalStampsUnlocked ?? 0) === 1 ? "stamp" : "stamps"}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -161,7 +163,11 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
       </div>
 
       {selected && (
-        <StudentDetailModal participant={selected} onClose={() => setSelected(null)} />
+        <StudentDetailModal
+          participant={selected}
+          passportSummary={passportByUid[selected.uid]}
+          onClose={() => setSelected(null)}
+        />
       )}
     </>
   );

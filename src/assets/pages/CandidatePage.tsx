@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { type Participant } from "../data/Students";
+import { type ParticipantPassportSummary } from "../../api/client";
 
 interface CandidatesPageProps {
   students: Participant[];
+  passportByUid?: Record<string, ParticipantPassportSummary>;
 }
 
 export default function CandidatesPage({ students }: CandidatesPageProps) {

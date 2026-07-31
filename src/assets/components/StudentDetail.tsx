@@ -26,6 +26,7 @@ import RadarProfileChart from "../components/RadarChart";
 import { useAuth } from "../../context/AuthContext";
 
 import { type Participant } from "../data/Students";
+import { type ParticipantPassportSummary } from "../../api/client";
 
 const normalize = (v: unknown): string => {
   if (typeof v === "string") {
@@ -47,9 +48,11 @@ const normalize = (v: unknown): string => {
 
 export default function StudentDetailModal({
   participant,
+  passportSummary,
   onClose,
 }: {
   participant: Participant;
+  passportSummary?: ParticipantPassportSummary;
   onClose: () => void;
 }) {
   const navigate = useNavigate();
@@ -59,12 +62,9 @@ export default function StudentDetailModal({
     Record<string, boolean>
   >({});
 
-  const skillCount = participant.skillPassport.length;
+  const skillCount = passportSummary?.totalStampsUnlocked ?? 0;
 
-  const totalMappings = participant.skillPassport.reduce(
-    (sum, sp) => sum + sp.totalMappings,
-    0
-  );
+  const totalMappings = passportSummary?.totalMappings ?? 0;
 
   const displayName = participant.displayName ?? participant.email;
 
@@ -187,8 +187,6 @@ export default function StudentDetailModal({
                                       key={`${sp.category}-${sp.firstMappedAt}`}
                                       className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition"
                                       onClick={() => {
-                                        // TODO:
-                                        // stamp detail modal
                                         console.log(
                                           "Selected stamp:",
                                           sp
@@ -270,57 +268,6 @@ export default function StudentDetailModal({
                 </div>
               </div>
             </div>
-
-            {skillCount > 0 && (
-              <section>
-                <h3 className="font-semibold mb-3">
-                  Skill Passport
-                </h3>
-
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Skill</TableHead>
-                      <TableHead>Domain</TableHead>
-                      <TableHead>Total Mappings</TableHead>
-                      <TableHead>First Earned</TableHead>
-                      <TableHead>Last Active</TableHead>
-                    </TableRow>
-                  </TableHeader>
-
-                  <TableBody>
-                    {participant.skillPassport.map((sp) => {
-                      
-                      return (
-                        <TableRow
-                          key={`${sp.category}-${sp.firstMappedAt}`}
-                        >
-                          <TableCell className="font-medium">
-                            {sp.category}
-                          </TableCell>
-
-                          <TableCell>
-                            {sp.totalMappings}
-                          </TableCell>
-
-                          <TableCell>
-                            {new Date(
-                              sp.firstMappedAt
-                            ).toLocaleDateString()}
-                          </TableCell>
-
-                          <TableCell>
-                            {new Date(
-                              sp.lastMappedAt
-                            ).toLocaleDateString()}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </section>
-            )}
           </div>
 
           <div className="border-t p-4 flex justify-between items-center bg-gray-50">

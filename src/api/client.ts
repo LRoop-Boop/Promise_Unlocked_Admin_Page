@@ -291,3 +291,34 @@ export async function getStampCategorySummary(
   );
   return response.categories;
 }
+
+export interface PassportCategory {
+  category: string;
+  totalMappings: number;
+  unlockedStampCount: number;
+}
+
+export interface ParticipantPassportSummary {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  schoolName: string | null;
+  passport: PassportCategory[];
+  totalStampsUnlocked: number;
+  totalMappings: number;
+  sessionStatusCounts: { completed: number; in_progress: number; abandoned: number };
+}
+
+interface AllPassportsResponse {
+  participants: ParticipantPassportSummary[];
+  total: number;
+  errors?: { uid: string; error: string }[];
+}
+
+export async function getAllPassports(token: string): Promise<ParticipantPassportSummary[]> {
+  const response = await apiFetch<AllPassportsResponse>('/participants/passport/all', { token });
+  if (response.errors?.length) {
+    console.warn('Some participant passports failed to load:', response.errors);
+  }
+  return response.participants;
+}

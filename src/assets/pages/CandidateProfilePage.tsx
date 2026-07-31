@@ -10,7 +10,7 @@ import {
 import { type Participant } from "../data/Students";
 import { Button } from "@/components/ui/button";
 import RadarProfileChart from "../components/RadarChart";
-import { getPvaCatalog, type ApiPva } from "../../api/client";
+import { getPvaCatalog, type ApiPva, type ParticipantPassportSummary } from "../../api/client";
 
 import StampsPanel from "../components/StampsPanel";
 import ChatLogPanel from "../components/ChatLogPanel";
@@ -34,8 +34,10 @@ const normalize = (v: unknown): string => {
 
 export default function CandidateProfilePage({
   students,
+  passportByUid = {},
 }: {
   students: Participant[];
+  passportByUid?: Record<string, ParticipantPassportSummary>;
 }) {
   const { id } = useParams();
   const { token } = useAuth();
@@ -75,10 +77,8 @@ export default function CandidateProfilePage({
   const selectedPvaName =
     pvas.find((p) => p.id === student.selectedPvaId)?.name ?? "None";
 
-  const totalStamps = student.skillPassport.reduce(
-    (sum, sp) => sum + sp.totalMappings,
-    0
-  );
+  const passportSummary = passportByUid[student.uid];
+  const totalStamps = passportSummary?.totalStampsUnlocked ?? 0;
 
   useEffect(() => {
     if (!token) return;
