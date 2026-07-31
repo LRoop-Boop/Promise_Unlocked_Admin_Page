@@ -59,7 +59,15 @@ export function adaptParticipant(raw: ApiParticipant): Participant {
 
     // Contact
     phone: raw.phone,
-    address: raw.address,
+    address: raw.address
+      ? {
+          street: raw.address,
+          city: null,
+          state: null,
+          postalCode: null,
+          country: null,
+        }
+      : null,
 
     // School
     schoolName: raw.schoolName,
@@ -260,4 +268,27 @@ export async function getSessionDetail(token: string, sessionId: string) {
     session: AdminSessionSummary;
     interactions: SessionInteraction[];
   }>;
+}
+
+export interface StampCategorySummary {
+  category: string;
+  stampInstances: number;
+  distinctStamps: number;
+  totalUnlocks: number;
+  participants: number;
+  sessions: number;
+}
+
+export interface StampCategorySummaryResponse {
+  categories: StampCategorySummary[];
+}
+
+export async function getStampCategorySummary(
+  token: string
+): Promise<StampCategorySummary[]> {
+  const response = await apiFetch<StampCategorySummaryResponse>(
+    '/admin/stamps/categories',
+    { token }
+  );
+  return response.categories;
 }

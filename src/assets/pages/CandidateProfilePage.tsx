@@ -273,9 +273,7 @@ export default function CandidateProfilePage({
               <div>
                 <p className="text-gray-400">Last Active</p>
                 <p>
-                  {student.lastActiveAt
-                    ? new Date(student.lastActiveAt).toLocaleDateString()
-                    : "Never"}
+                  {new Date(student.lastActiveAt || student.createdAt).toLocaleDateString()}
                 </p>
               </div>
             </div>

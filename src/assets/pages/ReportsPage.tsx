@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { BarChart3 } from "lucide-react";
 import { REGIONS } from "../data/Taxonomy";
 
@@ -8,6 +9,8 @@ import {
 } from "../components/ReportsCharts";
 
 import { type Participant } from "../data/Students";
+import { getStampCategorySummary, type StampCategorySummary } from "../../api/client";
+import { useAuth } from "../../context/AuthContext";
 
 interface ReportsPageProps {
   students: Participant[];
@@ -31,28 +34,52 @@ function StatCard({
 }
 
 export default function ReportsPage({ students }: ReportsPageProps) {
-  const totalProfiles = students.length;
+  const { token } = useAuth();
+  const [categorySummary, setCategorySummary] = useState<StampCategorySummary[]>([]);
 
+  useEffect(() => {
+    if (!token) return;
+
+    let cancelled = false;
+
+    getStampCategorySummary(token)
+      .then((data) => {
+        if (!cancelled) setCategorySummary(data);
+      })
+      .catch(console.error); // silent fail — chart falls back to client-side counts
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  const totalProfiles = students.length;
 
   const domainCounts: Record<string, number> = Object.fromEntries(
     REGIONS.map((region) => [region, 0])
   );
 
-  students.forEach((student) => {
-    for (const sp of student.skillPassport ?? []) {
+  if (categorySummary.length > 0) {
+    for (const c of categorySummary) {
+      if (c.category in domainCounts) {
+        domainCounts[c.category] = c.totalUnlocks;
+      }
+    }
+  } else {
+    students.forEach((student) => {
+      for (const sp of student.skillPassport ?? []) {
         if (sp.category in domainCounts) {
           domainCounts[sp.category] += sp.totalMappings;
         }
       }
-  });
+    });
+  }
 
-const topCategory =
-  Object.entries(domainCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ??
-  "N/A";
+  const topCategory =
+    Object.entries(domainCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "N/A";
 
   return (
     <div className="space-y-6">
-
       <div className="grid grid-cols-2 gap-4">
         <StatCard
           label="Total Profiles"
@@ -68,7 +95,10 @@ const topCategory =
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <ApplicationsByProgramChart students={students} />
+        <ApplicationsByProgramChart
+          students={students}
+          categorySummary={categorySummary}
+        />
         <StatusBreakdownChart students={students} />
       </div>
 

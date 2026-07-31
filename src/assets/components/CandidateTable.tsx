@@ -130,7 +130,7 @@ export default function CandidateTable({ students, filter }: CandidateTableProps
                     </TableCell>
                     <TableCell className="text-gray-600">{p.email}</TableCell>
                     <TableCell className="text-gray-600">
-                      {new Date(p.createdAt).toLocaleDateString("en-US", {
+                      {new Date(p.lastActiveAt || p.createdAt).toLocaleDateString("en-US", {
                         month: "short", day: "numeric", year: "numeric",
                       })}
                     </TableCell>

@@ -24,10 +24,12 @@ import CandidateTable from "../components/CandidateTable";
 import { Participant } from "../data/Students";
 import CandidateProfilePage from "./CandidateProfilePage";
 import TaxonomyPage from "./TaxonomyPage";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ApplicationsByProgramChart,
 } from "../components/ReportsCharts";
+import { getStampCategorySummary, type StampCategorySummary } from "../../api/client";
+import { useAuth } from "../../context/AuthContext";
 
 interface AdminDashboardProps {
   students: Participant[];
@@ -58,19 +60,37 @@ function StatCard({
 }
 
 function DashboardHome({ students }: { students: Participant[] }) {
+  const { token } = useAuth();
+  const [categorySummary, setCategorySummary] = useState<StampCategorySummary[]>([]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    let cancelled = false;
+
+    getStampCategorySummary(token)
+      .then((data) => {
+        if (!cancelled) setCategorySummary(data);
+      })
+      .catch(console.error);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
   const metrics = {
-  total: students.length,
-  newProfiles: students.length,
-  reviewed: 0,
-  mappedSkills: students.reduce(
-    (sum, s) => sum + s.skillPassport.length,
-    0
-  ),
-};
+    total: students.length,
+    newProfiles: students.length,
+    reviewed: 0,
+    mappedSkills: students.reduce(
+      (sum, s) => sum + s.skillPassport.length,
+      0
+    ),
+  };
 
   return (
     <div className="space-y-6">
-
       <div className="grid grid-cols-4 gap-4">
         <StatCard
           icon={Users}
@@ -102,7 +122,10 @@ function DashboardHome({ students }: { students: Participant[] }) {
       </div>
 
       <div className="space-y-6">
-        <ApplicationsByProgramChart students={students} />
+        <ApplicationsByProgramChart
+          students={students}
+          categorySummary={categorySummary}
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
@@ -116,9 +139,7 @@ function DashboardHome({ students }: { students: Participant[] }) {
           </span>
         </div>
 
-        <CandidateTable
-          students={students}
-        />
+        <CandidateTable students={students} />
       </div>
     </div>
   );

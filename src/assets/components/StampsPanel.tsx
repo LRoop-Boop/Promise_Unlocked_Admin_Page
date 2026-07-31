@@ -8,6 +8,8 @@ import {
   type StampEvidenceInteraction,
 } from "../../api/client";
 
+import StampBadge from "./StampBadge";
+
 export default function StampsPanel({
   token,
   participantId,
@@ -97,29 +99,27 @@ export default function StampsPanel({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {stamps.map((s) => (
-            <button
+          <button
             key={`${s.stampName}-${s.sessionId}`}
             onClick={() => openEvidence(s)}
-            className="border rounded-xl p-4 text-left hover:border-blue-400 hover:shadow transition bg-white"
-            >
-            <h3 className="font-semibold text-sm mb-2 line-clamp-2">
-                {s.stampName}
+            className="border rounded-xl p-4 flex flex-col items-center text-center hover:border-blue-400 hover:shadow transition bg-white"
+          >
+            <StampBadge stampName={s.stampName} tier={s.tier} size="list" />
+
+            <h3 className="font-semibold text-sm mt-3 mb-1 line-clamp-2">
+              {s.stampName}
             </h3>
 
-            <p className="text-xs text-gray-500 mb-3">
-                {s.category}
+            <p className="text-xs text-gray-500">
+              {s.category}
             </p>
 
-            <div className="space-y-1 text-xs text-gray-500">
-                <p>Tier {s.tier}</p>
-                <p>{s.timesUnlocked} unlock{s.timesUnlocked !== 1 ? "s" : ""}</p>
-                <p>
-                {new Date(s.firstUnlockedAt).toLocaleDateString()}
-                </p>
-            </div>
-            </button>
+            <p className="text-xs text-gray-400 mt-1">
+              Tier {s.tier}
+            </p>
+          </button>
         ))}
 
         {stamps.length === 0 && (

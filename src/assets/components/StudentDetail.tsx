@@ -257,14 +257,10 @@ export default function StudentDetailModal({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Award
-                      size={14}
-                      className="text-gray-400"
-                    />
-
+                    <Award size={14} className="text-gray-400" />
                     Last active{" "}
                     {new Date(
-                      participant.lastActiveAt
+                      participant.lastActiveAt || participant.createdAt
                     ).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
