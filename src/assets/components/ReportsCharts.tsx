@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import {
   BarChart,
   Bar,
@@ -14,7 +16,13 @@ import {
 
 import { type Participant } from "../data/Students";
 import { REGIONS } from "../data/Taxonomy";
-import { type StampCategorySummary, type ParticipantPassportSummary } from "../../api/client";
+import {
+  type StampCategorySummary,
+  type ParticipantPassportSummary,
+  getPvaCatalog,
+  type ApiPva,
+} from "../../api/client";
+import { useAuth } from "../../context/AuthContext";
 
 interface ChartProps {
   students: Participant[];
@@ -174,6 +182,53 @@ export function GpaDistributionChart({
           <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
           <Tooltip />
           <Bar dataKey="count" fill="#7c3aed" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function PvaDistributionChart({ students }: ChartProps) {
+  const { token } = useAuth();
+  const [pvas, setPvas] = useState<ApiPva[]>([]);
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+
+    getPvaCatalog(token)
+      .then((data) => !cancelled && setPvas(data))
+      .catch(console.error);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  const counts: Record<string, number> = {};
+  for (const s of students) {
+    const key = s.selectedPvaId ?? "unassigned";
+    counts[key] = (counts[key] ?? 0) + 1;
+  }
+
+  const chartData = [
+    ...pvas.map((p) => ({ name: p.name, count: counts[p.id] ?? 0 })),
+    { name: "Unassigned", count: counts["unassigned"] ?? 0 },
+  ];
+
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h3 className="text-base font-semibold text-gray-800 mb-4">
+        PVA Style Distribution
+      </h3>
+
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+          <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+          <Tooltip />
+          <Bar dataKey="count" fill="#ea580c" />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -6,6 +6,7 @@ import {
   ApplicationsByProgramChart,
   StatusBreakdownChart,
   GpaDistributionChart,
+  PvaDistributionChart,
 } from "../components/ReportsCharts";
 
 import { type Participant } from "../data/Students";
@@ -104,6 +105,8 @@ export default function ReportsPage({ students, passportByUid = {} }: ReportsPag
       </div>
 
       <GpaDistributionChart students={students} passportByUid={passportByUid} />
+
+      <PvaDistributionChart students={students} />
     </div>
   );
 }
