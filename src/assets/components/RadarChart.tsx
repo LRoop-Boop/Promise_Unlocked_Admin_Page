@@ -30,7 +30,7 @@ const TIER_TARGET_PER_REGION = 3;
 const RADAR_FLOOR = 8;
 const DEFAULT_TIER = 0; // TODO: confirm against mobile's config/stampConstants
 
-function computeRadarData(stamps: StampInstance[]) {
+export function computeRadarData(stamps: { category: string; tier: number }[]) {
   const tierPoints: Record<string, number> = {};
 
   for (const s of stamps) {
@@ -106,5 +106,16 @@ export default function RadarProfileChart({
         </RadarChart>
       </ResponsiveContainer>
     </div>
+  );
+}
+
+export function StaticRadarChart({ data }: { data: ReturnType<typeof computeRadarData> }) {
+  return (
+    <RadarChart width={500} height={280} data={data}>
+      <PolarGrid />
+      <PolarAngleAxis dataKey="domain" tick={{ fontSize: 11, fill: "#374151" }} />
+      <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+      <Radar dataKey="value" stroke="#2E6EE6" fill="#2E6EE6" fillOpacity={0.18} strokeWidth={2} isAnimationActive={false} />
+    </RadarChart>
   );
 }

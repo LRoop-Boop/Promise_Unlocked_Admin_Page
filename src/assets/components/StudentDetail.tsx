@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import {
   X,
@@ -27,6 +27,8 @@ import { useAuth } from "../../context/AuthContext";
 
 import { type Participant } from "../data/Students";
 import { type ParticipantPassportSummary } from "../../api/client";
+import PrintableProfile from "../components/PrintableProfile";
+import { usePrintProfile } from "../../hooks/usePrintProfile";
 
 const normalize = (v: unknown): string => {
   if (typeof v === "string") {
@@ -58,9 +60,11 @@ export default function StudentDetailModal({
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const [expandedDomains, setExpandedDomains] = useState<
+  const [expandedDomains, setExpandedDomains] = useState <
     Record<string, boolean>
   >({});
+
+  const { printStamps, printLoading, handlePrint } = usePrintProfile(token, participant.uid);
 
   const skillCount = passportSummary?.totalStampsUnlocked ?? 0;
 
@@ -258,7 +262,7 @@ export default function StudentDetailModal({
                     <Award size={14} className="text-gray-400" />
                     Last active{" "}
                     {new Date(
-                      participant.lastActiveAt || participant.createdAt
+                      participant.lastActiveAt
                     ).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -292,13 +296,17 @@ export default function StudentDetailModal({
                 Close
               </Button>
 
-              <Button disabled title="Coming soon">
-                Download
+              <Button variant="outline" onClick={handlePrint} disabled={printLoading}>
+                {printLoading ? "Preparing…" : "Print"}
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {printStamps && (
+        <PrintableProfile participant={participant} stamps={printStamps} />
+      )}
     </>
   );
 }

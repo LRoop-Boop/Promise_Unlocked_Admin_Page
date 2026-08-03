@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { getParticipantsPage } from '../../api/client';
 
 export interface PassportCategoryMapping {
@@ -50,7 +50,7 @@ export interface Participant {
     pageUrl: string | null;
   };
 
-  // PromiseUnlocked
+  // Pondera
   selectedPvaId: string | null;
 
   // Dates
@@ -67,7 +67,8 @@ const PAGE_SIZE = 100;
 export function useParticipants(token: string | null) {
   const [pages, setPages] = useState<Participant[][]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!token) {
@@ -87,28 +88,23 @@ export function useParticipants(token: string | null) {
         let page = 1;
         while (true) {
           const result = await getParticipantsPage(token!, page, PAGE_SIZE);
-           
           if (cancelled) return;
 
           collected.push(result.participants);
-
           if (result.participants.length < PAGE_SIZE) break;
           page += 1;
         }
         if (!cancelled) setPages(collected);
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load participants');
+        if (!cancelled) setError(err); // keep the real error object, not err.message
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     fetchAllPages();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [token]);
+    return () => { cancelled = true; };
+  }, [token, retryCount]);
 
   const participants = useMemo(() => {
     const seen = new Set<string>();
@@ -124,5 +120,7 @@ export function useParticipants(token: string | null) {
     return merged;
   }, [pages]);
 
-  return { participants, loading, error };
+  const refetch = useCallback(() => setRetryCount((c) => c + 1), []);
+
+  return { participants, loading, error, refetch };
 }

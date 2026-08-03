@@ -100,23 +100,23 @@ interface FetchOptions {
   body?: unknown;
 }
 
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 export async function apiFetch<T>(
   path: string,
   options: FetchOptions = {}
 ): Promise<T> {
   const { token, method = 'GET', body } = options;
-
   const headers: Record<string, string> = {};
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  if (body) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  console.log(`FULL URL ${BASE_URL}${path}`);
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (body) headers['Content-Type'] = 'application/json';
 
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
@@ -126,7 +126,7 @@ export async function apiFetch<T>(
   });
 
   if (!res.ok) {
-    throw new Error(`API error ${res.status}: ${path}`);
+    throw new ApiError(res.status, `API error ${res.status}: ${path}`);
   }
 
   return res.json() as Promise<T>;

@@ -14,6 +14,8 @@ import { getPvaCatalog, type ApiPva, type ParticipantPassportSummary } from "../
 
 import StampsPanel from "../components/StampsPanel";
 import ChatLogPanel from "../components/ChatLogPanel";
+import PrintableProfile from "../components/PrintableProfile";
+import { usePrintProfile } from "../../hooks/usePrintProfile";
 import { useAuth } from "../../context/AuthContext";
 
 const normalize = (v: unknown): string => {
@@ -97,6 +99,8 @@ export default function CandidateProfilePage({
       cancelled = true;
     };
   }, [token]);
+
+  const { printStamps, printLoading, handlePrint } = usePrintProfile(token, student.uid);
 
   return (
     <>
@@ -183,7 +187,11 @@ export default function CandidateProfilePage({
         </>
       )}
 
-      <div className="space-y-6">
+      {printStamps && (
+        <PrintableProfile participant={student} stamps={printStamps} />
+      )}
+
+      <div className="space-y-6 print:hidden">
         <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
           <div>
             <h1 className="text-2xl font-bold">
@@ -192,9 +200,14 @@ export default function CandidateProfilePage({
             <p className="text-sm text-gray-500">{student.email}</p>
           </div>
 
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            Back
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              Back
+            </Button>
+            <Button variant="outline" onClick={handlePrint} disabled={printLoading}>
+              {printLoading ? "Preparing…" : "Print"}
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
@@ -285,7 +298,7 @@ export default function CandidateProfilePage({
               <div>
                 <p className="text-gray-400">Last Active</p>
                 <p>
-                  {new Date(student.lastActiveAt || student.createdAt).toLocaleDateString()}
+                  {new Date(student.lastActiveAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
