@@ -4,8 +4,16 @@ import { computeRadarData, StaticRadarChart } from "./RadarChart";
 
 function formatDate(value: string | number | null | undefined) {
   if (!value) return "—";
+
+  // Date-only strings (e.g. birthdays) should not be timezone-adjusted.
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString();
+  }
+
   const d = new Date(value);
   if (isNaN(d.getTime())) return "—";
+
   return d.toLocaleDateString();
 }
 
